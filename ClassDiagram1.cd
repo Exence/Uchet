@@ -1,0 +1,123 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="Uchet.EditTableWindow" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="0.5" Y="5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ADAAAAAAAAQAAAAAEAAGAAAYAIAABICAAAAEAABAAAA=</HashCode>
+      <FileName>Views\EditTableWindow.xaml.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Uchet.MainWindow" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="5" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IGAAABIAEEQCALIiIAAYAxGVAECBAFBACHYAEBAAAAA=</HashCode>
+      <FileName>Views\MainWindow.xaml.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Uchet.Classes.ApplicationContext">
+    <Position X="5" Y="4.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAACCAAAAAAAAAEAEAAAAAAAgAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Classes\ApplicationContext.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Uchet.Classes.ArriveUser" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="7.25" Y="6.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAACAAAQAAAAAEIAAQAAAAgAAAAAAAAAAAAAAgAAA=</HashCode>
+      <FileName>Classes\ArriveUser.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Uchet.Classes.EditUser" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="2.75" Y="6" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+      <Compartment Name="Properties" Collapsed="true" />
+      <Compartment Name="Methods" Collapsed="true" />
+      <Compartment Name="Events" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier>
+      <HashCode>AAQAICAAAAIAACAALAAEIAAAlAAEAAQYgAAAgAAEAAA=</HashCode>
+      <FileName>Classes\EditUser.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Uchet.Classes.Flags" Collapsed="true">
+    <Position X="2.75" Y="4.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAQAAAAAAAAAEAAAAAAgAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Classes\Flags.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Uchet.Classes.MainUser">
+    <Position X="0.5" Y="7.5" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier>
+      <HashCode>IAABACAIAAAACAAACACQAAgA0AAAAAAAAAAAAAAAQwA=</HashCode>
+      <FileName>Classes\MainUser.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Uchet.Classes.ParsedString" Collapsed="true">
+    <Position X="7.25" Y="4.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAQEEAAAEAAEAAAAAAAAgAgAAAA=</HashCode>
+      <FileName>Classes\ParsedString.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Uchet.Classes.Rank">
+    <Position X="2.75" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAgA=</HashCode>
+      <FileName>Classes\Rank.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Uchet.Classes.Status">
+    <Position X="5" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAgA=</HashCode>
+      <FileName>Classes\Status.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Uchet.Classes.Team" BaseTypeListCollapsed="true">
+    <Position X="9.5" Y="7.5" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier>
+      <HashCode>IAAAAAAIAAAAAAAAIQGQAQEBlAEAAAwAAAgIACAAAgA=</HashCode>
+      <FileName>Classes\Team.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Uchet.Classes.User">
+    <Position X="7.25" Y="7.5" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAgAAAUIAQAFAAEAAAAAAAAIAAAAiA=</HashCode>
+      <FileName>Classes\User.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Uchet.Views.AboutWindow" Collapsed="true">
+    <Position X="0.5" Y="4" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>kIAAAAgAACAgCAUAAACAAAADAAAAEIAAAAAAAAAAAAA=</HashCode>
+      <FileName>Views\AboutWindow.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Uchet.Views.ChooseUserWindow" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="0.5" Y="6" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAEAAAAAAAAAAAAAAkAAAAAAACAAAAAAAAAAAA=</HashCode>
+      <FileName>Views\ChooseUserWindow.xaml.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

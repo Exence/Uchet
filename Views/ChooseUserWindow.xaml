@@ -1,0 +1,24 @@
+﻿<Window x:Class="Uchet.Views.ChooseUserWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Uchet.Views"
+        mc:Ignorable="d"
+        Title="Выберете порядковый номер" Height="192" Width="540" Loaded="Window_Loaded" Closed="Window_Closed">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+
+        <Label Content="В системе зарегистрированно:" HorizontalAlignment="Left" Margin="27,20,0,0" VerticalAlignment="Top" />
+        <Label Content="№_" x:Name="labelCount" HorizontalAlignment="Left" Margin="208,20,0,0" VerticalAlignment="Top" HorizontalContentAlignment="Center" Background="#FFFFFAFF" Foreground="#DDFF0000" FontWeight="Bold"/>
+        <Label Content="в/сл с именем:" HorizontalAlignment="Left" Margin="239,20,0,0" VerticalAlignment="Top"/>
+        <Label Content="Фамилия Имя Отчество" x:Name="labelName" HorizontalAlignment="Left" Margin="27,49,0,0" VerticalAlignment="Top" FontWeight="Bold"/>
+        <Label Content="Выберете один порядковый номер, для которого будет установлено время прибытия:" HorizontalAlignment="Center" Margin="0,77,0,0" VerticalAlignment="Top"/>
+        <ComboBox x:Name="comboBoxNum" HorizontalAlignment="Left" Margin="143,111,0,0" VerticalAlignment="Top" IsReadOnly="True" Width="120" RenderTransformOrigin="0.492,0.496" Height="32" SelectionChanged="comboBoxNum_SelectionChanged"/>
+        <Button Content="Подтвердить" HorizontalAlignment="Left" Margin="276,112,0,0" VerticalAlignment="Top" Width="120" Click="Button_Click"/>
+
+
+    </Grid>
+</Window>
