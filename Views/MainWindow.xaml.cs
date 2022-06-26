@@ -145,7 +145,6 @@ namespace Uchet
             }
             catch (Exception)
             {
-
                 MessageBox.Show("Возникла ошибка при работе с базой данных. Продолжение невозможно.");
                 Close();
             }
