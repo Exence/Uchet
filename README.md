@@ -2,7 +2,7 @@
 Программа учета прибытия
 
 # Resource
-WPF + SQLite
+WPF + SQLite + MaterialDesignThemes
 
 # NuGet
 1. System.Data.SQLite
