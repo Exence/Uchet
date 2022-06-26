@@ -8,3 +8,4 @@ WPF + SQLite
 1. Stub.System.Data.SQLite.Core.Net
 2. System.Data.SQLite
 3. MaterialDesign
+4. EntityFramework
