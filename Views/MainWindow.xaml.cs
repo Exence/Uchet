@@ -289,9 +289,9 @@ namespace Uchet
             TextBoxHours.IsEnabled = false;
             TextBoxMinutes.IsEnabled = false;
             ButtonStart.IsEnabled = false;
-            ButtonAddTeam.IsEnabled = false;
-            ButtonRemTeam.IsEnabled = false;
-            ButtonEditUsers.IsEnabled = false;
+            //ButtonAddTeam.IsEnabled = false;
+            //ButtonRemTeam.IsEnabled = false;
+            //ButtonEditUsers.IsEnabled = false;
             ButtonParse.IsEnabled = true;
             ButtonCh10.IsEnabled = true;
             ButtonCh15.IsEnabled = true;
@@ -299,6 +299,7 @@ namespace Uchet
             ButtonArrive.IsEnabled = true;
             ButtonGoodReason.IsEnabled = true;
             ButtonNoArrive.IsEnabled = true;
+
             LabelArriveCh10.Content = "0";
             LabelArriveCh15.Content = "0";
             LabelArriveCh20.Content = "0";
@@ -933,7 +934,7 @@ namespace Uchet
                         if (type != "noArrived" && type != "goodReason") /// Таблица прибытия с процентами
                         {
                             Range titelTeams = wordDoc.Paragraphs.Last.Range;
-                            titelTeams.Text = "Подразделения:\n";
+                            titelTeams.Text = "Подразделения:";
                             titelTeams.Font.Size = 12;
                             titelTeams.Font.Name = "Times New Roman";
                             titelTeams.Font.Bold = 1;
@@ -943,7 +944,7 @@ namespace Uchet
                             currentRange = wordDoc.Paragraphs.Last.Range;
                             currentRange.Select();
                             currentRange.Font.Bold = 0;
-                            currentRange.Font.Size = 10;
+                            currentRange.Font.Size = 12;
 
                             Table tableTeams = wordDoc.Tables.Add(currentRange, 1, 4);
                             tableTeams.Columns[2].Width = 50;
@@ -1000,8 +1001,14 @@ namespace Uchet
                             }
 
                             wordDoc.Paragraphs.Add();
-                        }                        
+                            Range titleArrived = wordDoc.Paragraphs.Last.Range;
+                            titleArrived.Select();
+                            titleArrived.Text = "Прибывшие от управления:\n";
+                            titleArrived.Font.Bold = 1;
+                            titleArrived.Font.Size = 12;
+                        }
 
+                        wordDoc.Paragraphs.Add();
                         currentRange = wordDoc.Paragraphs.Last.Range;
                         currentRange.Select();
                         currentRange.Font.Bold = 0;
@@ -1168,7 +1175,6 @@ namespace Uchet
                 }
                 catch (Exception)
                 {
-
                     MessageBox.Show("Возникла ошибка при работе с базой данных. Отчет не выгружен.");
                 }
             }
