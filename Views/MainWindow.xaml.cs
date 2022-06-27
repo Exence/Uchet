@@ -224,7 +224,7 @@ namespace Uchet
                 using (ApplicationContext db = new ApplicationContext())
                 {
                     ArriveUser selectedRow = GridUsers.SelectedItem as ArriveUser;
-                    MainUser mainUser = db.MainUsers.Find(selectedRow.num);
+                    MainUser mainUser = db.MainUsers.Where(mu => mu.Num == selectedRow.num).FirstOrDefault();
 
                     if (mainUser.Ch10 != null)
                     {
@@ -266,7 +266,7 @@ namespace Uchet
                 {
                     using (ApplicationContext db = new ApplicationContext())
                     {
-                        MainUser mainUser = db.MainUsers.Find(selectedRow.num);
+                        MainUser mainUser = db.MainUsers.Where(mu => mu.Num == selectedRow.num).FirstOrDefault();
                         if (mainUser != null)
                         {
                             DateTime currentTime = DateTime.Now;

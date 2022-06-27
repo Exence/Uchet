@@ -384,12 +384,11 @@ namespace Uchet
                     db.Users.Add(user);
                     db.SaveChanges();
                     user = db.Users.OrderBy(u => u.id).ToList().Last();
-                    MainUser mainUser = new MainUser(user.id, num, 5);
+                    MainUser mainUser = new MainUser(user.id, num, 6);
                     db.MainUsers.Add(mainUser);
                     db.SaveChanges();
                     RefreshGridUsers();
                     GridTable.SelectedIndex = GridTable.Items.Count - 1;
-
                 }
             }
             catch (Exception)

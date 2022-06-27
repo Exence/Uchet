@@ -162,8 +162,6 @@
                                     </Style.Triggers>
                                 </Style>
                             </DataGrid.CellStyle>
-
-
                             <DataGrid.Columns>
                                 <DataGridTextColumn Binding="{Binding Path=TeamName, UpdateSourceTrigger=PropertyChanged}" MinWidth="115">
                                     <DataGridTextColumn.Header>
