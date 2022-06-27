@@ -9,384 +9,390 @@
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         Title="Учет прибытия л/с" Height="800" Width="1200" MinWidth="1200" MinHeight="800" WindowStartupLocation="CenterScreen" WindowState="Maximized" IsVisibleChanged="Window_IsVisibleChanged">
 
-    <Grid>
+    <Grid VerticalAlignment="Stretch" ClipToBounds="True" TextOptions.TextRenderingMode="ClearType" RenderOptions.BitmapScalingMode="NearestNeighbor">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="25*"/>
-            <ColumnDefinition Width="79*"/>
-            <ColumnDefinition Width="296*"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="55" />
             <RowDefinition Height="*" />
-
         </Grid.RowDefinitions>
-        <StackPanel Grid.ColumnSpan="3">
-            <Menu VerticalAlignment="Top" Height="26" Margin="0,0,0,10">
-                <MenuItem Header="Файл" Height="25">
-                    <MenuItem Header="Загрузить" >
-                        <MenuItem Header="Отчет с КПП" Click="ButtonParse_Click"></MenuItem>
-                    </MenuItem>
-                    <MenuItem Header="Редактировать" >
-                        <MenuItem Header="Таблица 'Управление'" Click="ButtonEditUsers_Click"/>
-                    </MenuItem>
-                    <Separator />
-                    <MenuItem Header="Выход" Click="ButtonNoArrive_Click"></MenuItem>
+
+        <Menu VerticalAlignment="Top" Height="26" Margin="0,0,0,10" Grid.ColumnSpan="3">
+            <MenuItem Header="Файл" Height="25">
+                <MenuItem Header="Загрузить" >
+                    <MenuItem Header="Отчет с КПП" Click="ButtonParse_Click"></MenuItem>
                 </MenuItem>
-                <MenuItem Header="Списки" Height="25" >
-                    <MenuItem Header="Список 'Ч+1.00'" Click="ButtonCh10_Click"></MenuItem>
-                    <MenuItem Header="Список 'Ч+1.30'" Click="ButtonCh15_Click"></MenuItem>
-                    <MenuItem Header="Список 'Ч+2.00'" Click="ButtonCh20_Click"></MenuItem>
-                    <MenuItem Header="Список 'Не прибывшие'" ></MenuItem>
+                <MenuItem Header="Редактировать" >
+                    <MenuItem Header="Таблица 'Управление'" Click="ButtonEditUsers_Click"/>
                 </MenuItem>
-                <MenuItem Header="Справка" Height="28" x:Name="ButtonAbout" Click="ButtonAbout_Click"/>
-            </Menu>
-            <Grid Background="#FFE5E5E5" TextOptions.TextRenderingMode="ClearType" RenderOptions.BitmapScalingMode="NearestNeighbor" ScrollViewer.CanContentScroll="True" VerticalAlignment="Stretch">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="50*" />
-                        <RowDefinition Height="100*" MinHeight="700"/>
-                    </Grid.RowDefinitions>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition MinWidth="400" Width="200*" />
-                        <ColumnDefinition MinWidth="600" Width="322*" />
-                    </Grid.ColumnDefinitions>
-                
-                    <Border Grid.Column="0" Grid.ColumnSpan="3" Margin="2,0,2,0" Padding="2" 
+                <Separator />
+                <MenuItem Header="Выход" Click="ButtonNoArrive_Click"></MenuItem>
+            </MenuItem>
+            <MenuItem Header="Списки" Height="25" >
+                <MenuItem Header="Список 'Ч+1.00'" Click="ButtonCh10_Click"></MenuItem>
+                <MenuItem Header="Список 'Ч+1.30'" Click="ButtonCh15_Click"></MenuItem>
+                <MenuItem Header="Список 'Ч+2.00'" Click="ButtonCh20_Click"></MenuItem>
+                <MenuItem Header="Список 'Не прибывшие'" ></MenuItem>
+            </MenuItem>
+            <MenuItem Header="Справка" Height="28" x:Name="ButtonAbout" Click="ButtonAbout_Click"/>
+        </Menu>
+
+        <Border Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="1"  Margin="2,0,2,0" Padding="2" 
                             VerticalAlignment="Stretch" Background="White" Height="46">
-                        <Border.Effect>
-                            <DropShadowEffect BlurRadius="7" />
-                        </Border.Effect>
-                        <StackPanel Orientation="Horizontal">
-                            <Button Content="Старт" Width="80" Cursor="Hand" Height="32" Margin="5,0" VerticalAlignment="Center" x:Name="ButtonStart" Click="ButtonStart_Click" />
-                            <Label Content="Время подачи сигнала:" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="16" FontWeight="Bold"/>
-                            <TextBox x:Name="TextBoxHours" TextWrapping="Wrap" Text="00" Width="25" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="18" FontWeight="Bold" TextAlignment="Center" Foreground="Red" Cursor="IBeam" PreviewTextInput="TextBoxHours_PreviewTextInput" KeyUp="TextBoxHours_KeyUp" PreviewKeyDown="TextBoxHours_PreviewKeyDown" GotFocus="TextBoxHours_GotFocus" LostFocus="TextBoxHours_LostFocus" />
-                            <Label Content="ч." HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="16" FontWeight="Bold" />
-                            <TextBox x:Name="TextBoxMinutes" TextWrapping="Wrap" Text="00" Width="25" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="18" FontWeight="Bold" TextAlignment="Center" Foreground="Red" PreviewTextInput="TextBoxMinutes_PreviewTextInput" KeyUp="TextBoxMinutes_KeyUp" PreviewKeyDown="TextBoxMinutes_PreviewKeyDown" GotFocus="TextBoxMinutes_GotFocus" LostFocus="TextBoxMinutes_LostFocus" Cursor="Arrow" />
-                            <Label Content="мин." HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="16" FontWeight="Bold" />
-                            <StackPanel Margin="10,0,5,0">
-                                <Label Content="Текущее время:" HorizontalAlignment="Center" VerticalAlignment="Stretch" FontSize="10" FontWeight="Bold" Margin="0" Height="15" Padding="0"/>
-                                <Label Content="%TIME%" x:Name="LableTime" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="18" FontWeight="Bold" />
-                            </StackPanel>
-                            <StackPanel Margin="5,0">
-                                <Label Content="Время после сигнала:" HorizontalAlignment="Center" VerticalAlignment="Stretch" FontSize="10" FontWeight="Bold" Margin="0" Height="15" Padding="0"/>
-                                <Label Content="00:00:00" x:Name="LableSignalTime" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="18" FontWeight="Bold" />
-                            </StackPanel>
-                            <Label Content="дежурный по части:" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="16"  />
-                            <ComboBox x:Name="ComboBoxRank" Width="200" Margin="5,0" Padding="5,0" Text="воинское звание" Foreground="Gray" IsEditable="True" IsReadOnly="True" FontSize="16" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" Loaded="ComboBoxRank_Loaded" DropDownOpened="ComboBoxRank_DropDownOpened" DropDownClosed="ComboBoxRank_DropDownClosed" SelectionChanged="ComboBoxRank_SelectionChanged"/>
-                            <TextBox x:Name="TextBoxName" Width="200" TextWrapping="Wrap" Text="Фамилия И.О."  HorizontalAlignment="Stretch" VerticalAlignment="Stretch" FontSize="16" TextAlignment="Center" VerticalContentAlignment="Center" Foreground="Gray" GotFocus="TextBoxName_GotFocus" LostFocus="TextBoxName_LostFocus" PreviewKeyDown="TextBoxName_PreviewKeyDown" />
+            <Border.Effect>
+                <DropShadowEffect BlurRadius="7" />
+            </Border.Effect>
+            <StackPanel Orientation="Horizontal">
+                <Button Content="Старт" Width="80" Cursor="Hand" Height="32" Margin="5,0" VerticalAlignment="Center" x:Name="ButtonStart" Click="ButtonStart_Click" />
+                <Label Content="Время подачи сигнала:" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="16" FontWeight="Bold"/>
+                <TextBox x:Name="TextBoxHours" TextWrapping="Wrap" Text="00" Width="25" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="18" FontWeight="Bold" TextAlignment="Center" Foreground="Red" Cursor="IBeam" PreviewTextInput="TextBoxHours_PreviewTextInput" KeyUp="TextBoxHours_KeyUp" PreviewKeyDown="TextBoxHours_PreviewKeyDown" GotFocus="TextBoxHours_GotFocus" LostFocus="TextBoxHours_LostFocus" />
+                <Label Content="ч." HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="16" FontWeight="Bold" />
+                <TextBox x:Name="TextBoxMinutes" TextWrapping="Wrap" Text="00" Width="25" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="18" FontWeight="Bold" TextAlignment="Center" Foreground="Red" PreviewTextInput="TextBoxMinutes_PreviewTextInput" KeyUp="TextBoxMinutes_KeyUp" PreviewKeyDown="TextBoxMinutes_PreviewKeyDown" GotFocus="TextBoxMinutes_GotFocus" LostFocus="TextBoxMinutes_LostFocus" Cursor="Arrow" />
+                <Label Content="мин." HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="16" FontWeight="Bold" />
+                <StackPanel Margin="10,0,5,0">
+                    <Label Content="Текущее время:" HorizontalAlignment="Center" VerticalAlignment="Stretch" FontSize="10" FontWeight="Bold" Margin="0" Height="15" Padding="0"/>
+                    <Label Content="%TIME%" x:Name="LableTime" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="18" FontWeight="Bold" />
+                </StackPanel>
+                <StackPanel Margin="5,0">
+                    <Label Content="Время после сигнала:" HorizontalAlignment="Center" VerticalAlignment="Stretch" FontSize="10" FontWeight="Bold" Margin="0" Height="15" Padding="0"/>
+                    <Label Content="00:00:00" x:Name="LableSignalTime" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="18" FontWeight="Bold" />
+                </StackPanel>
+                <Label Content="дежурный по части:" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="16"  />
+                <ComboBox x:Name="ComboBoxRank" Width="200" Margin="5,0" Padding="5,0" Text="воинское звание" Foreground="Gray" IsEditable="True" IsReadOnly="True" FontSize="16" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" Loaded="ComboBoxRank_Loaded" DropDownOpened="ComboBoxRank_DropDownOpened" DropDownClosed="ComboBoxRank_DropDownClosed" SelectionChanged="ComboBoxRank_SelectionChanged"/>
+                <TextBox x:Name="TextBoxName" Width="200" TextWrapping="Wrap" Text="Фамилия И.О."  HorizontalAlignment="Stretch" VerticalAlignment="Stretch" FontSize="16" TextAlignment="Center" VerticalContentAlignment="Center" Foreground="Gray" GotFocus="TextBoxName_GotFocus" LostFocus="TextBoxName_LostFocus" PreviewKeyDown="TextBoxName_PreviewKeyDown" />
 
-                        </StackPanel>
+            </StackPanel>
 
 
-                    </Border>
-                    <Border Grid.Column="0" Grid.Row="1"  Margin="2,2,2,2" Padding="2" Background="White" VerticalAlignment="Stretch">
-                        <Border.Effect>
-                            <DropShadowEffect BlurRadius="7" />
-                        </Border.Effect>
-                        <StackPanel>
-                            <DataGrid x:Name = "GridUsers" Loaded="GridUsers_Loaded" CanUserAddRows="False" CanUserDeleteRows="False" FontSize="10" AutoGenerateColumns="False" MaxHeight="900" ColumnWidth="*">
-                                <DataGrid.Columns>
-                                    <DataGridTextColumn Binding="{Binding Path=num}" MinWidth="50" IsReadOnly="True" >
-                                        <DataGridTextColumn.Header>
-                                            <TextBlock TextAlignment="Center">
+        </Border>
+        <Grid Grid.Row="2" Background="#FFE5E5E5" TextOptions.TextRenderingMode="ClearType" RenderOptions.BitmapScalingMode="NearestNeighbor" ScrollViewer.CanContentScroll="True" VerticalAlignment="Stretch" ClipToBounds="True">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" MinHeight="650"/>
+
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition MinWidth="400" Width="200*" />
+                <ColumnDefinition MinWidth="600" Width="322*" />
+            </Grid.ColumnDefinitions>
+
+
+            <Grid ClipToBounds="True" >
+                <Grid.RowDefinitions>
+                    <RowDefinition MinHeight="200"/>
+                    <RowDefinition Height="auto"/>
+                </Grid.RowDefinitions>
+
+
+
+                <Border Grid.Column="0" Grid.Row="0" Grid.RowSpan="2" Margin="2,2,2,2" Padding="2" Background="White" VerticalAlignment="Stretch">
+                    <Border.Effect>
+                        <DropShadowEffect BlurRadius="7" />
+                    </Border.Effect>
+                </Border>               
+                    <DataGrid x:Name = "GridUsers" Loaded="GridUsers_Loaded" CanUserAddRows="False" CanUserDeleteRows="False" FontSize="10" AutoGenerateColumns="False" MaxHeight="900" ColumnWidth="*" Margin="4" HorizontalScrollBarVisibility="Hidden">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Binding="{Binding Path=num}" MinWidth="50" IsReadOnly="True" >
+                                <DataGridTextColumn.Header>
+                                    <TextBlock TextAlignment="Center">
                                             №
                                             <LineBreak/>п/п
-                                            </TextBlock>
-                                        </DataGridTextColumn.Header>
-                                    </DataGridTextColumn>
-                                    <DataGridTextColumn Header="Звание" Binding="{Binding Path=rank}" MinWidth="145" IsReadOnly="True" />
-                                    <DataGridTextColumn Header="ФИО" Binding="{Binding Path=fName}" MinWidth="170" IsReadOnly="True" />
-                                    <DataGridCheckBoxColumn Header="Прибытие" Binding="{Binding Path=isArrive, UpdateSourceTrigger=PropertyChanged}" MinWidth="80" IsReadOnly="False"/>
-                                </DataGrid.Columns>
-                            </DataGrid>
-                            <Button Content="Загрузить список прибывших из файла" Cursor="Hand" x:Name="ButtonParse" Width="200" Height="30"  Margin="2" Padding="0" Background="#FFB3B3B3" BorderBrush="#FF828282" Foreground="#DD000000" FontSize="10" Click="ButtonParse_Click" IsEnabled="False"/>
-                        </StackPanel>
-
-                    </Border>
-                <Border Grid.Column="1" Grid.Row="1"  Margin="2,2,2,2" Padding="2" Background="White"  VerticalAlignment="Stretch">
-                        <Border.Effect>
-                            <DropShadowEffect BlurRadius="7" />
-                        </Border.Effect>
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition MinHeight="380" Height="380*" />
-                            </Grid.RowDefinitions>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
-                            </Grid.ColumnDefinitions>
-                            <StackPanel CanVerticallyScroll="True" VerticalAlignment="Stretch" Grid.Row="0">
-                                <DataGrid x:Name="DataGridTeam" Loaded="DataGridTeam_Loaded" AutoGenerateColumns="False" FontSize="10" CanUserAddRows="False" CanUserDeleteRows="False" CanUserResizeRows="False" RowHeaderWidth="0"
+                                    </TextBlock>
+                                </DataGridTextColumn.Header>
+                            </DataGridTextColumn>
+                            <DataGridTextColumn Header="Звание" Binding="{Binding Path=rank}" MinWidth="145" IsReadOnly="True" />
+                            <DataGridTextColumn Header="ФИО" Binding="{Binding Path=fName}" MinWidth="170" IsReadOnly="True" />
+                            <DataGridCheckBoxColumn Header="Прибытие" Binding="{Binding Path=isArrive, UpdateSourceTrigger=PropertyChanged}" MinWidth="80" IsReadOnly="False"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                    <Button Grid.Row="2" Content="Загрузить список прибывших из файла" Cursor="Hand" x:Name="ButtonParse" Width="200" Height="30"  Margin="10" Padding="0" Background="#FFB3B3B3" BorderBrush="#FF828282" Foreground="#DD000000" FontSize="10" Click="ButtonParse_Click" IsEnabled="False"/>              
+            </Grid>
+            <Border Grid.Column="1" Grid.Row="1" Grid.RowSpan="2" Margin="2" Padding="2" Background="White"  VerticalAlignment="Stretch">
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="7" />
+                </Border.Effect>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition MinHeight="380" Height="380*" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel CanVerticallyScroll="True" VerticalAlignment="Stretch" Grid.Row="0">
+                        <DataGrid x:Name="DataGridTeam" Loaded="DataGridTeam_Loaded" AutoGenerateColumns="False" FontSize="10" CanUserAddRows="False" CanUserDeleteRows="False" CanUserResizeRows="False" RowHeaderWidth="0"
                                       GridLinesVisibility="All" ColumnWidth="*" CellEditEnding="DataGridTeam_CellEditEnding" Height="auto" MaxHeight="250" RowHeight="20">
-                                    <DataGrid.CellStyle>
-                                        <Style TargetType="DataGridCell">                                            
-                                            <Setter Property="Padding" Value="0" />
+                            <DataGrid.CellStyle>
+                                <Style TargetType="DataGridCell">
+                                    <Setter Property="Padding" Value="0" />
 
-                                            <Setter Property="Background" Value="Transparent" />
-                                            <Setter Property="BorderBrush" Value="Transparent" />
-                                            <Setter Property="Validation.ErrorTemplate" Value="{x:Null}" />
-                                            <Setter Property="Foreground" Value="{Binding Foreground, RelativeSource={RelativeSource AncestorType=DataGridRow}}" />
-                                            <Setter Property="Template">
-                                                    <Setter.Value>
-                                                        <ControlTemplate TargetType="{x:Type DataGridCell}">
-                                                            <Grid>
-                                                                <Border
+                                    <Setter Property="Background" Value="Transparent" />
+                                    <Setter Property="BorderBrush" Value="Transparent" />
+                                    <Setter Property="Validation.ErrorTemplate" Value="{x:Null}" />
+                                    <Setter Property="Foreground" Value="{Binding Foreground, RelativeSource={RelativeSource AncestorType=DataGridRow}}" />
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="{x:Type DataGridCell}">
+                                                <Grid>
+                                                    <Border
                                                                     Background="{TemplateBinding Background}"
                                                                     BorderBrush="{TemplateBinding BorderBrush}"
                                                                     BorderThickness="{TemplateBinding BorderThickness}"
                                                                     SnapsToDevicePixels="True"  
                                                                     />
-                                                                <ContentPresenter Margin="{TemplateBinding Padding}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />                                                            
-                                                        </Grid>                                                        
-                                                        </ControlTemplate>
-                                                    </Setter.Value>
-                                                </Setter>
-                                                <Style.Triggers>
-                                                    <Trigger Property="IsKeyboardFocusWithin" Value="True">
-                                                        <Setter Property="BorderBrush" Value="{DynamicResource MaterialDesignTextBoxBorder}" />
-                                                    </Trigger>
-                                                    <MultiDataTrigger>
-                                                        <MultiDataTrigger.Conditions>
-                                                            <Condition Binding="{Binding IsSelected, RelativeSource={RelativeSource Self}}" Value="True" />
-                                                            <Condition Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType=DataGridRow}}" Value="False" />
-                                                        </MultiDataTrigger.Conditions>
-                                                        <Setter Property="Background" Value="{DynamicResource MaterialDesignSelection}" />
-                                                    </MultiDataTrigger>
-                                                    <Trigger Property="IsEnabled" Value="False">
-                                                        <Setter Property="Opacity" Value=".56" />
-                                                    </Trigger>
-                                                </Style.Triggers>
-                                        </Style>
-                                    </DataGrid.CellStyle>
-                                    
+                                                    <ContentPresenter Margin="{TemplateBinding Padding}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                                                </Grid>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                    <Style.Triggers>
+                                        <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                                            <Setter Property="BorderBrush" Value="{DynamicResource MaterialDesignTextBoxBorder}" />
+                                        </Trigger>
+                                        <MultiDataTrigger>
+                                            <MultiDataTrigger.Conditions>
+                                                <Condition Binding="{Binding IsSelected, RelativeSource={RelativeSource Self}}" Value="True" />
+                                                <Condition Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType=DataGridRow}}" Value="False" />
+                                            </MultiDataTrigger.Conditions>
+                                            <Setter Property="Background" Value="{DynamicResource MaterialDesignSelection}" />
+                                        </MultiDataTrigger>
+                                        <Trigger Property="IsEnabled" Value="False">
+                                            <Setter Property="Opacity" Value=".56" />
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </DataGrid.CellStyle>
 
-                                    <DataGrid.Columns>
-                                        <DataGridTextColumn Binding="{Binding Path=TeamName, UpdateSourceTrigger=PropertyChanged}" MinWidth="115">
-                                            <DataGridTextColumn.Header>
-                                                <TextBlock TextAlignment="Center">
+
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Binding="{Binding Path=TeamName, UpdateSourceTrigger=PropertyChanged}" MinWidth="115">
+                                    <DataGridTextColumn.Header>
+                                        <TextBlock TextAlignment="Center">
                                             Подразделение
-                                                </TextBlock>
+                                        </TextBlock>
 
-                                            </DataGridTextColumn.Header>
+                                    </DataGridTextColumn.Header>
 
 
-                                        </DataGridTextColumn>
-                                        <DataGridTextColumn Binding="{Binding Path=OnList, UpdateSourceTrigger=PropertyChanged}" MinWidth="65">
-                                            <DataGridTextColumn.Header>
-                                                <TextBlock TextAlignment="Center">
+                                </DataGridTextColumn>
+                                <DataGridTextColumn Binding="{Binding Path=OnList, UpdateSourceTrigger=PropertyChanged}" MinWidth="65">
+                                    <DataGridTextColumn.Header>
+                                        <TextBlock TextAlignment="Center">
                                             По
                                             <LineBreak/>списку
-                                                </TextBlock>
-                                            </DataGridTextColumn.Header>
-                                        </DataGridTextColumn>
-                                        <DataGridTextColumn Binding="{Binding Path=OnFace}" MinWidth="65" IsReadOnly="True">
-                                            <DataGridTextColumn.Header>
-                                                <TextBlock TextAlignment="Center">
+                                        </TextBlock>
+                                    </DataGridTextColumn.Header>
+                                </DataGridTextColumn>
+                                <DataGridTextColumn Binding="{Binding Path=OnFace}" MinWidth="65" IsReadOnly="True">
+                                    <DataGridTextColumn.Header>
+                                        <TextBlock TextAlignment="Center">
                                             На
                                             <LineBreak/>лицо
-                                                </TextBlock>
-                                            </DataGridTextColumn.Header>
-                                        </DataGridTextColumn>
-                                        <DataGridTextColumn Binding="{Binding Path=OnService, UpdateSourceTrigger=PropertyChanged}" MinWidth="65">
-                                            <DataGridTextColumn.Header>
-                                                <TextBlock TextAlignment="Center">
+                                        </TextBlock>
+                                    </DataGridTextColumn.Header>
+                                </DataGridTextColumn>
+                                <DataGridTextColumn Binding="{Binding Path=OnService, UpdateSourceTrigger=PropertyChanged}" MinWidth="65">
+                                    <DataGridTextColumn.Header>
+                                        <TextBlock TextAlignment="Center">
                                             На
                                             <LineBreak/>службе
-                                                </TextBlock>
-                                            </DataGridTextColumn.Header>
-                                        </DataGridTextColumn>
-                                        <DataGridTextColumn Binding="{Binding Path=Absent, UpdateSourceTrigger=PropertyChanged}" MinWidth="65">
-                                            <DataGridTextColumn.Header>
-                                                <TextBlock TextAlignment="Center">
+                                        </TextBlock>
+                                    </DataGridTextColumn.Header>
+                                </DataGridTextColumn>
+                                <DataGridTextColumn Binding="{Binding Path=Absent, UpdateSourceTrigger=PropertyChanged}" MinWidth="65">
+                                    <DataGridTextColumn.Header>
+                                        <TextBlock TextAlignment="Center">
                                             По
                                             <LineBreak/>уважит.
-                                                </TextBlock>
-                                            </DataGridTextColumn.Header>
-                                        </DataGridTextColumn>
-                                        <DataGridTextColumn Binding="{Binding Path=ShouldCome}" MinWidth="65" IsReadOnly="True">
-                                            <DataGridTextColumn.Header>
-                                                <TextBlock TextAlignment="Center">
+                                        </TextBlock>
+                                    </DataGridTextColumn.Header>
+                                </DataGridTextColumn>
+                                <DataGridTextColumn Binding="{Binding Path=ShouldCome}" MinWidth="65" IsReadOnly="True">
+                                    <DataGridTextColumn.Header>
+                                        <TextBlock TextAlignment="Center">
                                             Долж.
                                             <LineBreak/>приб.
-                                                </TextBlock>
-                                            </DataGridTextColumn.Header>
+                                        </TextBlock>
+                                    </DataGridTextColumn.Header>
 
-                                        </DataGridTextColumn>
-                                        <DataGridTextColumn Binding="{Binding Path=Ch10, UpdateSourceTrigger=PropertyChanged}" MinWidth="65">
-                                            <DataGridTextColumn.Header>
-                                                <TextBlock TextAlignment="Center">
+                                </DataGridTextColumn>
+                                <DataGridTextColumn Binding="{Binding Path=Ch10, UpdateSourceTrigger=PropertyChanged}" MinWidth="65">
+                                    <DataGridTextColumn.Header>
+                                        <TextBlock TextAlignment="Center">
                                             "Ч" 
                                             <LineBreak/>+ 1.00
-                                                </TextBlock>
-                                            </DataGridTextColumn.Header>
-                                        </DataGridTextColumn>
-                                        <DataGridTextColumn Binding="{Binding Path=Ch15, UpdateSourceTrigger=PropertyChanged}" MinWidth="65">
-                                            <DataGridTextColumn.Header>
-                                                <TextBlock TextAlignment="Center">
+                                        </TextBlock>
+                                    </DataGridTextColumn.Header>
+                                </DataGridTextColumn>
+                                <DataGridTextColumn Binding="{Binding Path=Ch15, UpdateSourceTrigger=PropertyChanged}" MinWidth="65">
+                                    <DataGridTextColumn.Header>
+                                        <TextBlock TextAlignment="Center">
                                             "Ч" 
                                             <LineBreak/>+ 1.30
-                                                </TextBlock>
-                                            </DataGridTextColumn.Header>
-                                        </DataGridTextColumn>
-                                        <DataGridTextColumn Binding="{Binding Path=Ch20, UpdateSourceTrigger=PropertyChanged}" MinWidth="65">
-                                            <DataGridTextColumn.Header>
-                                                <TextBlock TextAlignment="Center">
+                                        </TextBlock>
+                                    </DataGridTextColumn.Header>
+                                </DataGridTextColumn>
+                                <DataGridTextColumn Binding="{Binding Path=Ch20, UpdateSourceTrigger=PropertyChanged}" MinWidth="65">
+                                    <DataGridTextColumn.Header>
+                                        <TextBlock TextAlignment="Center">
                                             "Ч" 
                                             <LineBreak/>+ 2.00
-                                                </TextBlock>
-                                            </DataGridTextColumn.Header>
-                                        </DataGridTextColumn>
-                                        <DataGridTextColumn  Binding="{Binding Path=NoArrived, UpdateSourceTrigger=PropertyChanged}" MinWidth="65" IsReadOnly="True">
-                                            <DataGridTextColumn.Header>
-                                                <TextBlock TextAlignment="Center">
+                                        </TextBlock>
+                                    </DataGridTextColumn.Header>
+                                </DataGridTextColumn>
+                                <DataGridTextColumn  Binding="{Binding Path=NoArrived, UpdateSourceTrigger=PropertyChanged}" MinWidth="65" IsReadOnly="True">
+                                    <DataGridTextColumn.Header>
+                                        <TextBlock TextAlignment="Center">
                                             Не 
                                             <LineBreak/>приб.
-                                                </TextBlock>
-                                            </DataGridTextColumn.Header>
-                                        </DataGridTextColumn>
+                                        </TextBlock>
+                                    </DataGridTextColumn.Header>
+                                </DataGridTextColumn>
 
-                                    </DataGrid.Columns>
-                                </DataGrid>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </StackPanel>
+
+                    <StackPanel CanVerticallyScroll="True" VerticalAlignment="Top" MaxHeight="380" Grid.Row="1" Height="380" >
+
+                        <Border MinHeight="45" Margin="2" Padding="2" Background="White">
+                            <Border.Effect>
+                                <DropShadowEffect BlurRadius="3" ShadowDepth="0"/>
+                            </Border.Effect>
+                            <StackPanel HorizontalAlignment="Stretch">
+                                <Grid Width="auto">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition MinWidth="115"/>
+                                        <ColumnDefinition MinWidth="65"/>
+                                        <ColumnDefinition MinWidth="65"/>
+                                        <ColumnDefinition MinWidth="65"/>
+                                        <ColumnDefinition MinWidth="65"/>
+                                        <ColumnDefinition MinWidth="65"/>
+                                        <ColumnDefinition MinWidth="65"/>
+                                        <ColumnDefinition MinWidth="65"/>
+                                        <ColumnDefinition MinWidth="65"/>
+                                        <ColumnDefinition MinWidth="65"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Label Content="Управление" FontSize="10" FontWeight="Bold" MinWidth="130" Grid.Column="0"/>
+                                    <Label x:Name="labelUprOnList" Content="0" FontSize="10" FontWeight="Bold" MinWidth="65" HorizontalContentAlignment="Center" HorizontalAlignment="Stretch" Grid.Column="1"/>
+                                    <Label x:Name="labelUprOnFace" Content="0" FontSize="10" FontWeight="Bold" MinWidth="65" HorizontalContentAlignment="Center" HorizontalAlignment="Stretch" Grid.Column="2"/>
+                                    <Label x:Name="labelUprOnService" Content="0" FontSize="10" FontWeight="Bold" MinWidth="65" HorizontalContentAlignment="Center" HorizontalAlignment="Stretch" Grid.Column="3"/>
+                                    <Label x:Name="labelUprAbsent" Content="0" FontSize="10" FontWeight="Bold" MinWidth="65" HorizontalContentAlignment="Center" HorizontalAlignment="Stretch" Grid.Column="4"/>
+                                    <Label x:Name="labelUprShouldCome" Content="0" FontSize="10" FontWeight="Bold" Foreground="Red"   MinWidth="65" HorizontalContentAlignment="Center" HorizontalAlignment="Stretch" Grid.Column="5"/>
+
+                                    <Label x:Name="labelUprCh10" Content="0" FontSize="10" FontWeight="Bold" MinWidth="65" HorizontalContentAlignment="Center" HorizontalAlignment="Stretch" Grid.Column="6"/>
+                                    <Label x:Name="labelUprCh15" Content="0" FontSize="10" FontWeight="Bold" MinWidth="65" HorizontalContentAlignment="Center" HorizontalAlignment="Stretch" Grid.Column="7"/>
+                                    <Label x:Name="labelUprCh20" Content="0" FontSize="10" FontWeight="Bold" MinWidth="65" HorizontalContentAlignment="Center" HorizontalAlignment="Stretch" Grid.Column="8"/>
+                                    <Label x:Name="labelUprNoArrive" Content="0" FontSize="10" FontWeight="Bold" MinWidth="65" HorizontalContentAlignment="Center" HorizontalAlignment="Stretch" Grid.Column="9"/>
+                                </Grid>
+                                <Grid Width="auto">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition MinWidth="115" Width="*"/>
+                                        <ColumnDefinition MinWidth="65"/>
+                                        <ColumnDefinition MinWidth="65"/>
+                                        <ColumnDefinition MinWidth="65"/>
+                                        <ColumnDefinition MinWidth="65"/>
+                                        <ColumnDefinition MinWidth="65"/>
+                                        <ColumnDefinition MinWidth="65"/>
+                                        <ColumnDefinition MinWidth="65"/>
+                                        <ColumnDefinition MinWidth="65"/>
+                                        <ColumnDefinition MinWidth="65"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Label Content="Всего" FontSize="10" FontWeight="Bold" MinWidth="130" Grid.Column="0"/>
+                                    <Label x:Name="labelOnList" Content="0" FontSize="10" FontWeight="Bold" MinWidth="65" HorizontalContentAlignment="Center" Grid.Column="1"/>
+                                    <Label x:Name="labelOnFace" Content="0" FontSize="10" FontWeight="Bold" MinWidth="65" HorizontalContentAlignment="Center" Grid.Column="2"/>
+                                    <Label x:Name="labelOnService" Content="0" FontSize="10" FontWeight="Bold" MinWidth="65" HorizontalContentAlignment="Center" Grid.Column="3"/>
+                                    <Label x:Name="labelAbsent" Content="0" FontSize="10" FontWeight="Bold" MinWidth="65" HorizontalContentAlignment="Center" Grid.Column="4"/>
+                                    <Label x:Name="labelShouldCome" Content="1" FontSize="10" FontWeight="Bold" Foreground="Red"   MinWidth="65" HorizontalContentAlignment="Center" Grid.Column="5"/>
+
+                                    <Label x:Name="labelCh10" Content="0" FontSize="10" FontWeight="Bold" MinWidth="65" HorizontalContentAlignment="Center" Grid.Column="6"/>
+                                    <Label x:Name="labelCh15" Content="0" FontSize="10" FontWeight="Bold" MinWidth="65" HorizontalContentAlignment="Center" Grid.Column="7"/>
+                                    <Label x:Name="labelCh20" Content="0" FontSize="10" FontWeight="Bold" MinWidth="65" HorizontalContentAlignment="Center" Grid.Column="8"/>
+                                    <Label x:Name="labelNoArrive" Content="0" FontSize="10" FontWeight="Bold" MinWidth="65" HorizontalContentAlignment="Center" Grid.Column="9"/>
+                                </Grid>
                             </StackPanel>
 
-                            <StackPanel CanVerticallyScroll="True" VerticalAlignment="Top" MaxHeight="380" Grid.Row="1" Height="380" >
+                        </Border>
+                        <Border MinHeight="35" Margin="2" Padding="0" Background="White" Height="40">
+                            <Border.Effect>
+                                <DropShadowEffect BlurRadius="3" ShadowDepth="0"/>
+                            </Border.Effect>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" >
+                                <Button Content="+ Добавить подразделение" Cursor="Hand" x:Name="ButtonAddTeam" Width="150" Height="20"  Margin="10" Padding="0" Background="#FF7AA766" BorderBrush="#FF2B7702" Foreground="#DD000000" FontSize="10" Click="ButtonAddTeam_Click"/>
+                                <Button Content="- Удалить подразделение" Cursor="Hand" x:Name="ButtonRemTeam" Width="150" Height="20"  Margin="10" Padding="0"  FontSize="10" Foreground="#DD000000" BorderBrush="#FF610700" Click="ButtonRemTeam_Click"/>
+                            </StackPanel>
+                        </Border>
+                        <Button Content="Пробить списки управления" Cursor="Hand" x:Name="ButtonEditUsers" Width="170" Height="30"  Margin="2" Padding="0" Background="#FFB3B3B3" BorderBrush="#FF828282" Foreground="#DD000000" FontSize="10" Click="ButtonEditUsers_Click"/>
+                        <Border MinHeight="150" Margin="2" Padding="2" Background="White">
+                            <Border.Effect>
+                                <DropShadowEffect BlurRadius="3" ShadowDepth="0"/>
+                            </Border.Effect>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition />
+                                    <ColumnDefinition />
+                                    <ColumnDefinition />
+                                </Grid.ColumnDefinitions>
+                                <Rectangle Stroke="Gray" Margin="10,10,10,10" Grid.Column="0"/>
+                                <StackPanel Grid.Column="0" >
+                                    <Label Content="Прибытие на 'Ч'+1.00" FontSize="11" Background="White" Width="126"  HorizontalAlignment="Left" HorizontalContentAlignment="Left" Margin="15,0" FontWeight="Bold"/>
+                                    <Label Content="0" x:Name="LabelArriveCh10" FontSize="18" FontWeight="Bold" Margin="20,0"/>
+                                    <Label Content="0,00%" x:Name="LabelPercentCh10" FontSize="18" FontWeight="Bold" Margin="20,0"/>
+                                    <Button Content="Экспорт отчета" Cursor="Hand" x:Name="ButtonCh10" Width="85" Height="20"  Margin="10" Padding="0" Background="#FFB3B3B3" BorderBrush="#FF828282" Foreground="#DD000000" FontSize="10" Click="ButtonCh10_Click" IsEnabled="False" />
+                                </StackPanel>
+                                <Rectangle Stroke="Gray" Margin="10,10,10,10" Grid.Column="1"/>
+                                <StackPanel Grid.Column="1">
 
-                                <Border MinHeight="45" Margin="2" Padding="2" Background="White">
-                                    <Border.Effect>
-                                        <DropShadowEffect BlurRadius="3" ShadowDepth="0"/>
-                                    </Border.Effect>
-                                    <StackPanel HorizontalAlignment="Stretch">
-                                        <Grid Width="auto">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition MinWidth="115"/>
-                                                <ColumnDefinition MinWidth="65"/>
-                                                <ColumnDefinition MinWidth="65"/>
-                                                <ColumnDefinition MinWidth="65"/>
-                                                <ColumnDefinition MinWidth="65"/>
-                                                <ColumnDefinition MinWidth="65"/>
-                                                <ColumnDefinition MinWidth="65"/>
-                                                <ColumnDefinition MinWidth="65"/>
-                                                <ColumnDefinition MinWidth="65"/>
-                                                <ColumnDefinition MinWidth="65"/>
-                                            </Grid.ColumnDefinitions>
-                                            <Label Content="Управление" FontSize="10" FontWeight="Bold" MinWidth="130" Grid.Column="0"/>
-                                            <Label x:Name="labelUprOnList" Content="0" FontSize="10" FontWeight="Bold" MinWidth="65" HorizontalContentAlignment="Center" HorizontalAlignment="Stretch" Grid.Column="1"/>
-                                            <Label x:Name="labelUprOnFace" Content="0" FontSize="10" FontWeight="Bold" MinWidth="65" HorizontalContentAlignment="Center" HorizontalAlignment="Stretch" Grid.Column="2"/>
-                                            <Label x:Name="labelUprOnService" Content="0" FontSize="10" FontWeight="Bold" MinWidth="65" HorizontalContentAlignment="Center" HorizontalAlignment="Stretch" Grid.Column="3"/>
-                                            <Label x:Name="labelUprAbsent" Content="0" FontSize="10" FontWeight="Bold" MinWidth="65" HorizontalContentAlignment="Center" HorizontalAlignment="Stretch" Grid.Column="4"/>
-                                            <Label x:Name="labelUprShouldCome" Content="0" FontSize="10" FontWeight="Bold" Foreground="Red"   MinWidth="65" HorizontalContentAlignment="Center" HorizontalAlignment="Stretch" Grid.Column="5"/>
+                                    <Label Content="Прибытие на 'Ч'+1.30"  FontSize="11" Background="White" Width="126"  HorizontalAlignment="Left" HorizontalContentAlignment="Left" Margin="15,0" FontWeight="Bold"/>
+                                    <Label Content="0" x:Name="LabelArriveCh15" FontSize="18" FontWeight="Bold" Margin="20,0"/>
+                                    <Label Content="0,00%" x:Name="LabelPercentCh15" FontSize="18" FontWeight="Bold" Margin="20,0"/>
+                                    <Button Content="Экспорт отчета" Cursor="Hand" x:Name="ButtonCh15" Width="85" Height="20"  Margin="10" Padding="0" Background="#FFB3B3B3" BorderBrush="#FF828282" Foreground="#DD000000" FontSize="10" Click="ButtonCh15_Click" IsEnabled="False"/>
+                                </StackPanel>
+                                <Rectangle Stroke="Gray" Margin="10,10,10,10" Grid.Column="2"/>
+                                <StackPanel Grid.Column="2">
 
-                                            <Label x:Name="labelUprCh10" Content="0" FontSize="10" FontWeight="Bold" MinWidth="65" HorizontalContentAlignment="Center" HorizontalAlignment="Stretch" Grid.Column="6"/>
-                                            <Label x:Name="labelUprCh15" Content="0" FontSize="10" FontWeight="Bold" MinWidth="65" HorizontalContentAlignment="Center" HorizontalAlignment="Stretch" Grid.Column="7"/>
-                                            <Label x:Name="labelUprCh20" Content="0" FontSize="10" FontWeight="Bold" MinWidth="65" HorizontalContentAlignment="Center" HorizontalAlignment="Stretch" Grid.Column="8"/>
-                                            <Label x:Name="labelUprNoArrive" Content="0" FontSize="10" FontWeight="Bold" MinWidth="65" HorizontalContentAlignment="Center" HorizontalAlignment="Stretch" Grid.Column="9"/>
-                                        </Grid>
-                                        <Grid Width="auto">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition MinWidth="115" Width="*"/>
-                                                <ColumnDefinition MinWidth="65"/>
-                                                <ColumnDefinition MinWidth="65"/>
-                                                <ColumnDefinition MinWidth="65"/>
-                                                <ColumnDefinition MinWidth="65"/>
-                                                <ColumnDefinition MinWidth="65"/>
-                                                <ColumnDefinition MinWidth="65"/>
-                                                <ColumnDefinition MinWidth="65"/>
-                                                <ColumnDefinition MinWidth="65"/>
-                                                <ColumnDefinition MinWidth="65"/>
-                                            </Grid.ColumnDefinitions>
-                                            <Label Content="Всего" FontSize="10" FontWeight="Bold" MinWidth="130" Grid.Column="0"/>
-                                            <Label x:Name="labelOnList" Content="0" FontSize="10" FontWeight="Bold" MinWidth="65" HorizontalContentAlignment="Center" Grid.Column="1"/>
-                                            <Label x:Name="labelOnFace" Content="0" FontSize="10" FontWeight="Bold" MinWidth="65" HorizontalContentAlignment="Center" Grid.Column="2"/>
-                                            <Label x:Name="labelOnService" Content="0" FontSize="10" FontWeight="Bold" MinWidth="65" HorizontalContentAlignment="Center" Grid.Column="3"/>
-                                            <Label x:Name="labelAbsent" Content="0" FontSize="10" FontWeight="Bold" MinWidth="65" HorizontalContentAlignment="Center" Grid.Column="4"/>
-                                            <Label x:Name="labelShouldCome" Content="1" FontSize="10" FontWeight="Bold" Foreground="Red"   MinWidth="65" HorizontalContentAlignment="Center" Grid.Column="5"/>
+                                    <Label Content="Прибытие на 'Ч'+2.00" FontSize="11" Background="White" Width="126"  HorizontalAlignment="Left" HorizontalContentAlignment="Left" Margin="15,0" FontWeight="Bold"/>
+                                    <Label Content="0" x:Name="LabelArriveCh20" FontSize="18" FontWeight="Bold" Margin="20,0"/>
+                                    <Label Content="0,00%" x:Name="LabelPercentCh20" FontSize="18" FontWeight="Bold" Margin="20,0"/>
+                                    <Button Content="Экспорт отчета" Cursor="Hand" x:Name="ButtonCh20" Width="85" Height="20"  Margin="10" Padding="0" Background="#FFB3B3B3" BorderBrush="#FF828282" Foreground="#DD000000" FontSize="10" Click="ButtonCh20_Click" IsEnabled="False"/>
+                                </StackPanel>
 
-                                            <Label x:Name="labelCh10" Content="0" FontSize="10" FontWeight="Bold" MinWidth="65" HorizontalContentAlignment="Center" Grid.Column="6"/>
-                                            <Label x:Name="labelCh15" Content="0" FontSize="10" FontWeight="Bold" MinWidth="65" HorizontalContentAlignment="Center" Grid.Column="7"/>
-                                            <Label x:Name="labelCh20" Content="0" FontSize="10" FontWeight="Bold" MinWidth="65" HorizontalContentAlignment="Center" Grid.Column="8"/>
-                                            <Label x:Name="labelNoArrive" Content="0" FontSize="10" FontWeight="Bold" MinWidth="65" HorizontalContentAlignment="Center" Grid.Column="9"/>
-                                        </Grid>
-                                    </StackPanel>
-
-                                </Border>
-                                <Border MinHeight="35" Margin="2" Padding="0" Background="White" Height="40">
-                                    <Border.Effect>
-                                        <DropShadowEffect BlurRadius="3" ShadowDepth="0"/>
-                                    </Border.Effect>
-                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" >
-                                        <Button Content="+ Добавить подразделение" Cursor="Hand" x:Name="ButtonAddTeam" Width="150" Height="20"  Margin="10" Padding="0" Background="#FF7AA766" BorderBrush="#FF2B7702" Foreground="#DD000000" FontSize="10" Click="ButtonAddTeam_Click"/>
-                                        <Button Content="- Удалить подразделение" Cursor="Hand" x:Name="ButtonRemTeam" Width="150" Height="20"  Margin="10" Padding="0"  FontSize="10" Foreground="#DD000000" BorderBrush="#FF610700" Click="ButtonRemTeam_Click"/>
-                                    </StackPanel>
-                                </Border>
-                                <Button Content="Пробить списки управления" Cursor="Hand" x:Name="ButtonEditUsers" Width="170" Height="30"  Margin="2" Padding="0" Background="#FFB3B3B3" BorderBrush="#FF828282" Foreground="#DD000000" FontSize="10" Click="ButtonEditUsers_Click"/>
-                                <Border MinHeight="150" Margin="2" Padding="2" Background="White">
-                                    <Border.Effect>
-                                        <DropShadowEffect BlurRadius="3" ShadowDepth="0"/>
-                                    </Border.Effect>
-                                    <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition />
-                                            <ColumnDefinition />
-                                            <ColumnDefinition />
-                                        </Grid.ColumnDefinitions>
-                                        <Rectangle Stroke="Gray" Margin="10,10,10,10" Grid.Column="0"/>
-                                        <StackPanel Grid.Column="0" >
-                                            <Label Content="Прибытие на 'Ч'+1.00" FontSize="11" Background="White" Width="126"  HorizontalAlignment="Left" HorizontalContentAlignment="Left" Margin="15,0" FontWeight="Bold"/>
-                                            <Label Content="0" x:Name="LabelArriveCh10" FontSize="18" FontWeight="Bold" Margin="20,0"/>
-                                            <Label Content="0,00%" x:Name="LabelPercentCh10" FontSize="18" FontWeight="Bold" Margin="20,0"/>
-                                            <Button Content="Экспорт отчета" Cursor="Hand" x:Name="ButtonCh10" Width="85" Height="20"  Margin="10" Padding="0" Background="#FFB3B3B3" BorderBrush="#FF828282" Foreground="#DD000000" FontSize="10" Click="ButtonCh10_Click" IsEnabled="False" />
-                                        </StackPanel>
-                                        <Rectangle Stroke="Gray" Margin="10,10,10,10" Grid.Column="1"/>
-                                        <StackPanel Grid.Column="1">
-
-                                            <Label Content="Прибытие на 'Ч'+1.30"  FontSize="11" Background="White" Width="126"  HorizontalAlignment="Left" HorizontalContentAlignment="Left" Margin="15,0" FontWeight="Bold"/>
-                                            <Label Content="0" x:Name="LabelArriveCh15" FontSize="18" FontWeight="Bold" Margin="20,0"/>
-                                            <Label Content="0,00%" x:Name="LabelPercentCh15" FontSize="18" FontWeight="Bold" Margin="20,0"/>
-                                        <Button Content="Экспорт отчета" Cursor="Hand" x:Name="ButtonCh15" Width="85" Height="20"  Margin="10" Padding="0" Background="#FFB3B3B3" BorderBrush="#FF828282" Foreground="#DD000000" FontSize="10" Click="ButtonCh15_Click" IsEnabled="False"/>
-                                        </StackPanel>
-                                        <Rectangle Stroke="Gray" Margin="10,10,10,10" Grid.Column="2"/>
-                                        <StackPanel Grid.Column="2">
-
-                                            <Label Content="Прибытие на 'Ч'+2.00" FontSize="11" Background="White" Width="126"  HorizontalAlignment="Left" HorizontalContentAlignment="Left" Margin="15,0" FontWeight="Bold"/>
-                                            <Label Content="0" x:Name="LabelArriveCh20" FontSize="18" FontWeight="Bold" Margin="20,0"/>
-                                            <Label Content="0,00%" x:Name="LabelPercentCh20" FontSize="18" FontWeight="Bold" Margin="20,0"/>
-                                        <Button Content="Экспорт отчета" Cursor="Hand" x:Name="ButtonCh20" Width="85" Height="20"  Margin="10" Padding="0" Background="#FFB3B3B3" BorderBrush="#FF828282" Foreground="#DD000000" FontSize="10" Click="ButtonCh20_Click" IsEnabled="False"/>
-                                        </StackPanel>
-
-                                    </Grid>
-                                </Border>
-                                <Border MinHeight="45" Margin="2" Padding="2" Background="White">
-                                    <Border.Effect>
-                                        <DropShadowEffect BlurRadius="3" ShadowDepth="0"/>
-                                    </Border.Effect>
-                                    <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition />
-                                            <ColumnDefinition />
-                                            <ColumnDefinition />
-                                        </Grid.ColumnDefinitions>
-                                        <Grid.RowDefinitions>
-                                            <RowDefinition />
-                                            <RowDefinition />
-                                        </Grid.RowDefinitions>
-                                        <Label Content="Отчет о прибытии" FontSize="10" FontWeight="Bold" Grid.Column="0" Grid.Row="0" HorizontalContentAlignment="Center" VerticalAlignment="Center"/>
-                                        <Label FontSize="10" FontWeight="Bold" Grid.Column="1" Grid.Row="0" HorizontalContentAlignment="Center" VerticalAlignment="Center" Padding="0" xml:space="preserve">   Список отсутствующих 
+                            </Grid>
+                        </Border>
+                        <Border MinHeight="45" Margin="2" Padding="2" Background="White">
+                            <Border.Effect>
+                                <DropShadowEffect BlurRadius="3" ShadowDepth="0"/>
+                            </Border.Effect>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition />
+                                    <ColumnDefinition />
+                                    <ColumnDefinition />
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition />
+                                    <RowDefinition />
+                                </Grid.RowDefinitions>
+                                <Label Content="Отчет о прибытии" FontSize="10" FontWeight="Bold" Grid.Column="0" Grid.Row="0" HorizontalContentAlignment="Center" VerticalAlignment="Center"/>
+                                <Label FontSize="10" FontWeight="Bold" Grid.Column="1" Grid.Row="0" HorizontalContentAlignment="Center" VerticalAlignment="Center" Padding="0" xml:space="preserve">   Список отсутствующих 
 по уважительной причине</Label>
-                                        <Label Content="Список не прибывших" FontSize="10" FontWeight="Bold" Grid.Column="2" Grid.Row="0" HorizontalContentAlignment="Center"/>
+                                <Label Content="Список не прибывших" FontSize="10" FontWeight="Bold" Grid.Column="2" Grid.Row="0" HorizontalContentAlignment="Center"/>
 
-                                    <Button Content="Экспорт отчета" Cursor="Hand" x:Name="ButtonArrive" Width="85" Height="20"  Margin="10" Padding="0" Background="#FFB3B3B3" BorderBrush="#FF828282" Foreground="#DD000000" FontSize="10" Grid.Column="0" Grid.Row="1" Click="ButtonArrive_Click" IsEnabled="False"/>
-                                    <Button Content="Экспорт отчета" Cursor="Hand" x:Name="ButtonGoodReason" Width="85" Height="20"  Margin="10" Padding="0" Background="#FFB3B3B3" BorderBrush="#FF828282" Foreground="#DD000000" FontSize="10" Grid.Column="1" Grid.Row="1" Click="ButtonGoodReason_Click" IsEnabled="False"/>
-                                    <Button Content="Экспорт отчета" Cursor="Hand" x:Name="ButtonNoArrive" Width="85" Height="20"  Margin="10" Padding="0" Background="#FFB3B3B3" BorderBrush="#FF828282" Foreground="#DD000000" FontSize="10" Grid.Column="2" Grid.Row="1" Click="ButtonNoArrive_Click" IsEnabled="False"/>
+                                <Button Content="Экспорт отчета" Cursor="Hand" x:Name="ButtonArrive" Width="85" Height="20"  Margin="10" Padding="0" Background="#FFB3B3B3" BorderBrush="#FF828282" Foreground="#DD000000" FontSize="10" Grid.Column="0" Grid.Row="1" Click="ButtonArrive_Click" IsEnabled="False"/>
+                                <Button Content="Экспорт отчета" Cursor="Hand" x:Name="ButtonGoodReason" Width="85" Height="20"  Margin="10" Padding="0" Background="#FFB3B3B3" BorderBrush="#FF828282" Foreground="#DD000000" FontSize="10" Grid.Column="1" Grid.Row="1" Click="ButtonGoodReason_Click" IsEnabled="False"/>
+                                <Button Content="Экспорт отчета" Cursor="Hand" x:Name="ButtonNoArrive" Width="85" Height="20"  Margin="10" Padding="0" Background="#FFB3B3B3" BorderBrush="#FF828282" Foreground="#DD000000" FontSize="10" Grid.Column="2" Grid.Row="1" Click="ButtonNoArrive_Click" IsEnabled="False"/>
 
-                                    </Grid>
+                            </Grid>
 
-                                </Border>
-                            </StackPanel>
-                        </Grid>
-                    </Border>
-
-                    
+                        </Border>
+                    </StackPanel>
                 </Grid>
-        </StackPanel>
+            </Border>
+
+
+        </Grid>
+
 
     </Grid>
-            
+
 </Window>

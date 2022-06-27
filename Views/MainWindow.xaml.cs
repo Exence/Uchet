@@ -35,9 +35,6 @@ namespace Uchet
             LiveTime.Interval = TimeSpan.FromSeconds(1);
             LiveTime.Tick += timer_Tick;
             LiveTime.Start();
-
-
-
         }
 
         void timer_Tick(object sender, EventArgs e)
@@ -94,7 +91,7 @@ namespace Uchet
 
                     foreach (MainUser mainUser in mainUsers)
                     {
-                        if (mainUser.StatusId == 0)
+                        if (mainUser.StatusId == 1)
                         {
                             num = mainUser.Num;
                             usr = db.Users.Where(u => u.id == mainUser.UserId).FirstOrDefault();
@@ -114,7 +111,7 @@ namespace Uchet
                         }
                         else
                         {
-                            if (mainUser.StatusId == 1)
+                            if (mainUser.StatusId == 2)
                             {
                                 onService += 1;
                             }
@@ -164,7 +161,7 @@ namespace Uchet
                 using (ApplicationContext db = new ApplicationContext())
                 {
                     ArriveUser selectedRow = GridUsers.SelectedItem as ArriveUser;
-                    MainUser mainUser = db.MainUsers.Find(selectedRow.num);
+                    MainUser mainUser = db.MainUsers.Where(mu => mu.Num == selectedRow.num).FirstOrDefault();
                     if (currentTime < Convert.ToDateTime("01:00:00"))
                     {
                         SummLabelInt(LabelArriveCh10, LabelArriveCh10, 1);
@@ -229,31 +226,26 @@ namespace Uchet
                     ArriveUser selectedRow = GridUsers.SelectedItem as ArriveUser;
                     MainUser mainUser = db.MainUsers.Find(selectedRow.num);
 
-
-
                     if (mainUser.Ch10 != null)
                     {
                         SummLabelInt(LabelArriveCh10, LabelArriveCh10, -1);
                         SummLabelInt(LabelArriveCh15, LabelArriveCh15, -1);
                         SummLabelInt(LabelArriveCh20, LabelArriveCh20, -1);
-
-
+                        mainUser.Ch10 = null;
                     }
                     else if (mainUser.Ch15 != null)
                     {
                         SummLabelInt(LabelArriveCh15, LabelArriveCh15, -1);
                         SummLabelInt(LabelArriveCh20, LabelArriveCh20, -1);
+                        mainUser.Ch15 = null;
                     }
-                    else
+                    else if (mainUser.Ch20 != null)
                     {
                         SummLabelInt(LabelArriveCh20, LabelArriveCh20, -1);
+                        mainUser.Ch20 = null;
                     }
 
                     SummLabelInt(labelUprNoArrive, labelUprNoArrive, 1);
-
-                    mainUser.Ch10 = null;
-                    mainUser.Ch15 = null;
-                    mainUser.Ch20 = null;
 
                     db.SaveChanges();
                 }
@@ -263,8 +255,6 @@ namespace Uchet
                 MessageBox.Show("Возникла ошибка при работе с базой данных. Продолжение невозможно.");
                 Close();
             }
-
-
         }
 
         private void ArriveUsers_ListChanged(object sender, ListChangedEventArgs e)
@@ -306,9 +296,7 @@ namespace Uchet
                     MessageBox.Show("Возникла ошибка при работе с базой данных. Продолжение невозможно.");
                     Close();
                 }
-
             }
-
         }
 
         private void ButtonStart_Click(object sender, RoutedEventArgs e)
@@ -834,7 +822,6 @@ namespace Uchet
             {
                 MessageBox.Show(ex.Message);
 
-
                 MessageBox.Show("Возникла ошибка при работе с базой данных. Строка не добавлена.");
             }
         }
@@ -842,8 +829,8 @@ namespace Uchet
         private void ButtonRemTeam_Click(object sender, RoutedEventArgs e)
         {
             Team selectedRow = DataGridTeam.SelectedItem as Team;
-            if (selectedRow != null)
-            {
+            if (selectedRow != null && DataGridTeam.Items.Count > 1)
+            {                
                 try
                 {
                     using (ApplicationContext db = new ApplicationContext()) ///
@@ -857,11 +844,12 @@ namespace Uchet
                 }
                 catch (Exception)
                 {
-
                     MessageBox.Show("Возникла ошибка при работе с базой данных. Строка не удалена.");
                 }
-
-
+            }
+            else
+            {
+                MessageBox.Show("Строка не выбрана, либо является последней в таблице. Удаление НЕВОЗМОЖНО!");
             }
         }
 
@@ -889,14 +877,18 @@ namespace Uchet
             RefreshGridTeams();
         }
 
-        private void ButtonCh10_Click(object sender, RoutedEventArgs e)
-        {            
+        private void WordReport (string type)
+        {
             if (ComboBoxRank.SelectedIndex == -1 || TextBoxName.Text == "Фамилия И.О.")
             {
                 MessageBox.Show("Введите в/зв и ФИО дежурного по части (Правый верхний угол)");
             }
             else
             {
+                string arrived = "";
+                string percent = "";
+                string time = "";
+
                 try
                 {
                     using (ApplicationContext db = new ApplicationContext()) ///
@@ -913,7 +905,35 @@ namespace Uchet
                         }
 
                         Range title = wordDoc.Paragraphs[1].Range;
-                        title.Text = "Отчет о прибытии на Ч+1.00\n";
+                        Range currentRange = wordDoc.Paragraphs.Last.Range;
+
+                        switch (type)
+                        {
+                            case "ch10":
+                                title.Text = "Отчет о прибытии на Ч+1.00\n";
+                                break;
+                            case "ch15":
+                                title.Text = "Отчет о прибытии на Ч+1.30\n";
+                                break;
+                            case "ch20":
+                                title.Text = "Отчет о прибытии на Ч+2.00\n";
+                                break;                            
+                            case "arrived":
+                                title.Text = "Отчет о прибытии\nВремя с подачи сигнала: " + LableSignalTime.Content;
+                                wordDoc.Paragraphs.Add();
+                                break;
+                            case "noArrived":
+                                time = "Список не прибывших от управления\nВремя с подачи сигнала: " + LableSignalTime.Content;
+                                wordDoc.Paragraphs.Add();
+                                title.Text = time;
+                                break;
+                            case "goodReason":
+                                title.Text = "Список отсутствующих по уважительной причине";
+                                break;
+                            default:
+                                break;
+                        }
+
                         title.Font.Size = 14;
                         title.Font.Name = "Times New Roman";
                         title.Font.Bold = 1;
@@ -922,726 +942,127 @@ namespace Uchet
                         title.ParagraphFormat.SpaceAfter = 0;
                         wordDoc.Paragraphs.Add();
 
-                        Range titelTeams = wordDoc.Paragraphs[2].Range;
-                        titelTeams.Text = "Подразделения:\n";
-                        titelTeams.Font.Size = 12;
-                        titelTeams.Font.Name = "Times New Roman";
-                        titelTeams.Font.Bold = 1;
-                        titelTeams.ParagraphFormat.Alignment = WdParagraphAlignment.wdAlignParagraphJustify;
-                        wordDoc.Paragraphs.Add();
-
-
-
-                        Range currentRange = wordDoc.Paragraphs.Last.Range;
-                        currentRange.Select();
-                        currentRange.Font.Bold = 0;
-                        currentRange.Font.Size = 10;
-
-                        Table tableTeams = wordDoc.Tables.Add(currentRange, 1, 4);
-                        tableTeams.Columns[2].Width = 50;
-                        tableTeams.AutoFitBehavior(WdAutoFitBehavior.wdAutoFitWindow);
-
-                        tableTeams.Cell(1, 1).Range.Text = "Управление";
-                        foreach (Team team in teams)
+                        if (type != "arrived" && type != "noArrived" && type != "goodReason") /// Таблица прибытия с процентами
                         {
-                            tableTeams.Cell(1, 1).Range.Text += team.TeamName;
-                            tableTeams.Cell(1, 1).Range.ParagraphFormat.Alignment = WdParagraphAlignment.wdAlignParagraphLeft;
-                        }
+                            Range titelTeams = wordDoc.Paragraphs[2].Range;
+                            titelTeams.Text = "Подразделения:\n";
+                            titelTeams.Font.Size = 12;
+                            titelTeams.Font.Name = "Times New Roman";
+                            titelTeams.Font.Bold = 1;
+                            titelTeams.ParagraphFormat.Alignment = WdParagraphAlignment.wdAlignParagraphJustify;
+                            wordDoc.Paragraphs.Add();
 
-                        tableTeams.Cell(1, 2).Range.Text = "- " + labelUprCh10.Content.ToString();
-                        tableTeams.Cell(1, 2).Range.ParagraphFormat.Alignment = WdParagraphAlignment.wdAlignParagraphLeft;
-                        foreach (Team team in teams)
-                        {
-                            tableTeams.Cell(1, 2).Range.Text += "- " + team.Ch10;
-                        }
 
-                        tableTeams.Cell(1, 3).Range.Text = "ВСЕГО: " + LabelArriveCh10.Content.ToString();
-                        tableTeams.Cell(1, 3).Range.Font.Bold = 1;
-                        tableTeams.Cell(1, 3).Range.Font.Size = 24;
-                        tableTeams.Cell(1, 3).VerticalAlignment = WdCellVerticalAlignment.wdCellAlignVerticalCenter;
-                        tableTeams.Cell(1, 4).Range.Text = LabelPercentCh10.Content.ToString();
-                        tableTeams.Cell(1, 4).Range.Font.Bold = 1;
-                        tableTeams.Cell(1, 4).Range.Font.Size = 24;
-                        tableTeams.Cell(1, 4).VerticalAlignment = WdCellVerticalAlignment.wdCellAlignVerticalCenter;
 
-                        wordDoc.Paragraphs.Add();
+                            currentRange = wordDoc.Paragraphs.Last.Range;
+                            currentRange.Select();
+                            currentRange.Font.Bold = 0;
+                            currentRange.Font.Size = 10;
 
-                        currentRange = wordDoc.Paragraphs.Last.Range;
-                        currentRange.Select();
-                        currentRange.ParagraphFormat.Alignment = WdParagraphAlignment.wdAlignParagraphLeft;
+                            Table tableTeams = wordDoc.Tables.Add(currentRange, 1, 4);
+                            tableTeams.Columns[2].Width = 50;
+                            tableTeams.AutoFitBehavior(WdAutoFitBehavior.wdAutoFitWindow);
 
-                        Table tableMain = wordDoc.Tables.Add(currentRange, 1, 6);
-                        tableMain.Columns[1].Width = 50;
-                        tableMain.Columns[2].Width = 150;
-                        tableMain.AutoFitBehavior(WdAutoFitBehavior.wdAutoFitWindow);
-
-                        User user = new User();
-                        Rank rank = new Rank();
-
-                        int i = 1;
-                        foreach (MainUser mainUser in db.MainUsers)
-                        {
-                            if (mainUser != null)
+                            tableTeams.Cell(1, 1).Range.Text = "Управление";
+                            foreach (Team team in teams)
                             {
-                                if (mainUser.Ch10 != null)
-                                {
-
-                                    user = db.Users.Find(mainUser.UserId);
-                                    rank = db.Ranks.Find(user.RankId);
-                                    tableMain.Rows.Add(tableMain.Rows[i]);
-                                    tableMain.Rows[i].Borders[WdBorderType.wdBorderBottom].LineStyle = WdLineStyle.wdLineStyleSingle;
-                                    tableMain.Cell(i, 1).Range.Text = i.ToString();
-                                    tableMain.Cell(i, 2).Range.Text = rank.rankName;
-                                    tableMain.Cell(i, 3).Range.Text = user.Surname;
-                                    tableMain.Cell(i, 4).Range.Text = user.Name;
-                                    tableMain.Cell(i, 5).Range.Text = user.middleName;
-                                    tableMain.Cell(i, 6).Range.Text = mainUser.Ch10;
-                                    i++;
-                                }
+                                tableTeams.Cell(1, 1).Range.Text += team.TeamName;
+                                tableTeams.Cell(1, 1).Range.ParagraphFormat.Alignment = WdParagraphAlignment.wdAlignParagraphLeft;
                             }
-                        }
 
-                        wordDoc.Paragraphs.Add();
-                        currentRange = wordDoc.Paragraphs.Last.Range;
-                        currentRange.Select();
-                        string str = "Дежурный по части\n" + ComboBoxRank.Text + "\t______________\t\t" + TextBoxName.Text;
-                        currentRange.Text = str;
-
-                        wordDoc.Save();
-
-                        try
-                        {
-                            wordDoc.Close();
-                            app.Quit();
-
-                        }
-                        catch (Exception)
-                        {
-
-                            throw;
-                        }
-
-                    }
-                }
-                catch (Exception)
-                {
-
-                    MessageBox.Show("Возникла ошибка при работе с базой данных. Отчет не выгружен.");
-                }
-            }    
-
-            
-
-        }
-
-        private void ButtonCh15_Click(object sender, RoutedEventArgs e)
-        {
-            if (ComboBoxRank.SelectedIndex == -1 || TextBoxName.Text == "Фамилия И.О.")
-            {
-                MessageBox.Show("Введите в/зв и ФИО дежурного по части (Правый верхний угол)");
-            }
-            else
-            {
-                try
-                {
-                    using (ApplicationContext db = new ApplicationContext()) ///
-                    {
-                        List<Team> teams = db.Teams.ToList();
-
-                        Application app = new Application();
-                        Document wordDoc = app.Documents.Add(Visible: true);
-
-
-                        if (app.Options.Overtype)
-                        {
-                            app.Options.Overtype = false;
-                        }
-
-                        Range title = wordDoc.Paragraphs[1].Range;
-                        title.Text = "Отчет о прибытии на Ч+1.30\n";
-                        title.Font.Size = 14;
-                        title.Font.Name = "Times New Roman";
-                        title.Font.Bold = 1;
-                        title.ParagraphFormat.Alignment = WdParagraphAlignment.wdAlignParagraphCenter;
-                        title.ParagraphFormat.LineSpacingRule = WdLineSpacing.wdLineSpaceSingle;
-                        title.ParagraphFormat.SpaceAfter = 0;
-                        wordDoc.Paragraphs.Add();
-
-                        Range titelTeams = wordDoc.Paragraphs[2].Range;
-                        titelTeams.Text = "Подразделения:\n";
-                        titelTeams.Font.Size = 12;
-                        titelTeams.Font.Name = "Times New Roman";
-                        titelTeams.Font.Bold = 1;
-                        titelTeams.ParagraphFormat.Alignment = WdParagraphAlignment.wdAlignParagraphJustify;
-                        wordDoc.Paragraphs.Add();
-
-
-
-                        Range currentRange = wordDoc.Paragraphs.Last.Range;
-                        currentRange.Select();
-                        currentRange.Font.Bold = 0;
-                        currentRange.Font.Size = 10;
-
-                        Table tableTeams = wordDoc.Tables.Add(currentRange, 1, 4);
-                        tableTeams.Columns[2].Width = 50;
-                        tableTeams.AutoFitBehavior(WdAutoFitBehavior.wdAutoFitWindow);
-
-                        tableTeams.Cell(1, 1).Range.Text = "Управление";
-                        foreach (Team team in teams)
-                        {
-                            tableTeams.Cell(1, 1).Range.Text += team.TeamName;
-                            tableTeams.Cell(1, 1).Range.ParagraphFormat.Alignment = WdParagraphAlignment.wdAlignParagraphLeft;
-                        }
-
-                        tableTeams.Cell(1, 2).Range.Text = "- " + labelUprCh10.Content.ToString();
-                        tableTeams.Cell(1, 2).Range.ParagraphFormat.Alignment = WdParagraphAlignment.wdAlignParagraphLeft;
-                        foreach (Team team in teams)
-                        {
-                            tableTeams.Cell(1, 2).Range.Text += "- " + team.Ch15;
-                        }
-
-                        tableTeams.Cell(1, 3).Range.Text = "ВСЕГО: " + LabelArriveCh15.Content.ToString();
-                        tableTeams.Cell(1, 3).Range.Font.Bold = 1;
-                        tableTeams.Cell(1, 3).Range.Font.Size = 24;
-                        tableTeams.Cell(1, 3).VerticalAlignment = WdCellVerticalAlignment.wdCellAlignVerticalCenter;
-                        tableTeams.Cell(1, 4).Range.Text = LabelPercentCh10.Content.ToString();
-                        tableTeams.Cell(1, 4).Range.Font.Bold = 1;
-                        tableTeams.Cell(1, 4).Range.Font.Size = 24;
-                        tableTeams.Cell(1, 4).VerticalAlignment = WdCellVerticalAlignment.wdCellAlignVerticalCenter;
-
-                        wordDoc.Paragraphs.Add();
-
-                        currentRange = wordDoc.Paragraphs.Last.Range;
-                        currentRange.Select();
-                        currentRange.ParagraphFormat.Alignment = WdParagraphAlignment.wdAlignParagraphLeft;
-
-                        Table tableMain = wordDoc.Tables.Add(currentRange, 1, 6);
-                        tableMain.Columns[1].Width = 50;
-                        tableMain.Columns[2].Width = 150;
-                        tableMain.AutoFitBehavior(WdAutoFitBehavior.wdAutoFitWindow);
-
-                        User user = new User();
-                        Rank rank = new Rank();
-
-                        int i = 1;
-                        foreach (MainUser mainUser in db.MainUsers)
-                        {
-                            if (mainUser != null)
+                            switch (type)
                             {
-                                if (mainUser.Ch15 != null)
-                                {
-
-                                    user = db.Users.Find(mainUser.UserId);
-                                    rank = db.Ranks.Find(user.RankId);
-                                    tableMain.Rows.Add(tableMain.Rows[i]);
-                                    tableMain.Rows[i].Borders[WdBorderType.wdBorderBottom].LineStyle = WdLineStyle.wdLineStyleSingle;
-                                    tableMain.Cell(i, 1).Range.Text = i.ToString();
-                                    tableMain.Cell(i, 2).Range.Text = rank.rankName;
-                                    tableMain.Cell(i, 3).Range.Text = user.Surname;
-                                    tableMain.Cell(i, 4).Range.Text = user.Name;
-                                    tableMain.Cell(i, 5).Range.Text = user.middleName;
-                                    tableMain.Cell(i, 6).Range.Text = mainUser.Ch10;
-                                    i++;
-                                }
+                                case "ch10":
+                                    tableTeams.Cell(1, 2).Range.Text = "- " + labelUprCh10.Content.ToString();
+                                    arrived = LabelArriveCh10.Content.ToString();
+                                    percent = LabelPercentCh10.Content.ToString();
+                                    break;
+                                case "ch15":
+                                    tableTeams.Cell(1, 2).Range.Text = "- " + labelUprCh15.Content.ToString();
+                                    arrived = LabelArriveCh15.Content.ToString();
+                                    percent = LabelPercentCh15.Content.ToString();
+                                    break;
+                                case "ch20":
+                                    tableTeams.Cell(1, 2).Range.Text = "- " + labelUprCh20.Content.ToString();
+                                    arrived = LabelArriveCh20.Content.ToString();
+                                    percent = LabelPercentCh20.Content.ToString();
+                                    break;
                             }
-                        }
 
-                        wordDoc.Paragraphs.Add();
-                        currentRange = wordDoc.Paragraphs.Last.Range;
-                        currentRange.Select();
-                        string str = "Дежурный по части\n" + ComboBoxRank.Text + "\t______________\t\t" + TextBoxName.Text;
-                        currentRange.Text = str;
-
-                        wordDoc.Save();
-
-                        try
-                        {
-                            wordDoc.Close();
-                            app.Quit();
-
-                        }
-                        catch (Exception)
-                        {
-
-                            throw;
-                        }
-
-                    }
-                }
-                catch (Exception)
-                {
-
-                    MessageBox.Show("Возникла ошибка при работе с базой данных. Отчет не выгружен.");
-                }
-            }
-        }
-
-        private void ButtonCh20_Click(object sender, RoutedEventArgs e)
-        {
-            if (ComboBoxRank.SelectedIndex == -1 || TextBoxName.Text == "Фамилия И.О.")
-            {
-                MessageBox.Show("Введите в/зв и ФИО дежурного по части (Правый верхний угол)");
-            }
-            else
-            {
-                try
-                {
-                    using (ApplicationContext db = new ApplicationContext()) ///
-                    {
-                        List<Team> teams = db.Teams.ToList();
-
-                        Application app = new Application();
-                        Document wordDoc = app.Documents.Add(Visible: true);
-
-
-                        if (app.Options.Overtype)
-                        {
-                            app.Options.Overtype = false;
-                        }
-
-                        Range title = wordDoc.Paragraphs[1].Range;
-                        title.Text = "Отчет о прибытии на Ч+2.00\n";
-                        title.Font.Size = 14;
-                        title.Font.Name = "Times New Roman";
-                        title.Font.Bold = 1;
-                        title.ParagraphFormat.Alignment = WdParagraphAlignment.wdAlignParagraphCenter;
-                        title.ParagraphFormat.LineSpacingRule = WdLineSpacing.wdLineSpaceSingle;
-                        title.ParagraphFormat.SpaceAfter = 0;
-                        wordDoc.Paragraphs.Add();
-
-                        Range titelTeams = wordDoc.Paragraphs[2].Range;
-                        titelTeams.Text = "Подразделения:\n";
-                        titelTeams.Font.Size = 12;
-                        titelTeams.Font.Name = "Times New Roman";
-                        titelTeams.Font.Bold = 1;
-                        titelTeams.ParagraphFormat.Alignment = WdParagraphAlignment.wdAlignParagraphJustify;
-                        wordDoc.Paragraphs.Add();
-
-
-
-                        Range currentRange = wordDoc.Paragraphs.Last.Range;
-                        currentRange.Select();
-                        currentRange.Font.Bold = 0;
-                        currentRange.Font.Size = 10;
-
-                        Table tableTeams = wordDoc.Tables.Add(currentRange, 1, 4);
-                        tableTeams.Columns[2].Width = 50;
-                        tableTeams.AutoFitBehavior(WdAutoFitBehavior.wdAutoFitWindow);
-
-                        tableTeams.Cell(1, 1).Range.Text = "Управление";
-                        foreach (Team team in teams)
-                        {
-                            tableTeams.Cell(1, 1).Range.Text += team.TeamName;
-                            tableTeams.Cell(1, 1).Range.ParagraphFormat.Alignment = WdParagraphAlignment.wdAlignParagraphLeft;
-                        }
-
-                        tableTeams.Cell(1, 2).Range.Text = "- " + labelUprCh20.Content.ToString();
-                        tableTeams.Cell(1, 2).Range.ParagraphFormat.Alignment = WdParagraphAlignment.wdAlignParagraphLeft;
-                        foreach (Team team in teams)
-                        {
-                            tableTeams.Cell(1, 2).Range.Text += "- " + team.Ch20;
-                        }
-
-                        tableTeams.Cell(1, 3).Range.Text = "ВСЕГО: " + LabelArriveCh10.Content.ToString();
-                        tableTeams.Cell(1, 3).Range.Font.Bold = 1;
-                        tableTeams.Cell(1, 3).Range.Font.Size = 24;
-                        tableTeams.Cell(1, 3).VerticalAlignment = WdCellVerticalAlignment.wdCellAlignVerticalCenter;
-                        tableTeams.Cell(1, 4).Range.Text = LabelPercentCh10.Content.ToString();
-                        tableTeams.Cell(1, 4).Range.Font.Bold = 1;
-                        tableTeams.Cell(1, 4).Range.Font.Size = 24;
-                        tableTeams.Cell(1, 4).VerticalAlignment = WdCellVerticalAlignment.wdCellAlignVerticalCenter;
-
-                        wordDoc.Paragraphs.Add();
-
-                        currentRange = wordDoc.Paragraphs.Last.Range;
-                        currentRange.Select();
-                        currentRange.ParagraphFormat.Alignment = WdParagraphAlignment.wdAlignParagraphLeft;
-
-                        Table tableMain = wordDoc.Tables.Add(currentRange, 1, 6);
-                        tableMain.Columns[1].Width = 50;
-                        tableMain.Columns[2].Width = 150;
-                        tableMain.AutoFitBehavior(WdAutoFitBehavior.wdAutoFitWindow);
-
-                        User user = new User();
-                        Rank rank = new Rank();
-
-                        int i = 1;
-                        foreach (MainUser mainUser in db.MainUsers)
-                        {
-                            if (mainUser != null)
+                            tableTeams.Cell(1, 2).Range.ParagraphFormat.Alignment = WdParagraphAlignment.wdAlignParagraphLeft;
+                            foreach (Team team in teams)
                             {
-                                if (mainUser.Ch10 != null)
+                                switch (type)
                                 {
-
-                                    user = db.Users.Find(mainUser.UserId);
-                                    rank = db.Ranks.Find(user.RankId);
-                                    tableMain.Rows.Add(tableMain.Rows[i]);
-                                    tableMain.Rows[i].Borders[WdBorderType.wdBorderBottom].LineStyle = WdLineStyle.wdLineStyleSingle;
-                                    tableMain.Cell(i, 1).Range.Text = i.ToString();
-                                    tableMain.Cell(i, 2).Range.Text = rank.rankName;
-                                    tableMain.Cell(i, 3).Range.Text = user.Surname;
-                                    tableMain.Cell(i, 4).Range.Text = user.Name;
-                                    tableMain.Cell(i, 5).Range.Text = user.middleName;
-                                    tableMain.Cell(i, 6).Range.Text = mainUser.Ch20;
-                                    i++;
+                                    case "ch10":
+                                        tableTeams.Cell(1, 2).Range.Text += "- " + team.Ch10;
+                                        break;
+                                    case "ch15":
+                                        tableTeams.Cell(1, 2).Range.Text += "- " + team.Ch15;
+                                        break;
+                                    case "ch20":
+                                        tableTeams.Cell(1, 2).Range.Text += "- " + team.Ch20;
+                                        break;
                                 }
+
                             }
-                        }
 
-                        wordDoc.Paragraphs.Add();
-                        currentRange = wordDoc.Paragraphs.Last.Range;
-                        currentRange.Select();
-                        string str = "Дежурный по части\n" + ComboBoxRank.Text + "\t______________\t\t" + TextBoxName.Text;
-                        currentRange.Text = str;
-
-                        wordDoc.Save();
-
-                        try
-                        {
-                            wordDoc.Close();
-                            app.Quit();
-
-                        }
-                        catch (Exception)
-                        {
-
-                            throw;
-                        }
-
-                    }
-                }
-                catch (Exception)
-                {
-
-                    MessageBox.Show("Возникла ошибка при работе с базой данных. Отчет не выгружен.");
-                }
-            }
-        }
-
-        private void ButtonArrive_Click(object sender, RoutedEventArgs e)
-        {
-            if (ComboBoxRank.SelectedIndex == -1 || TextBoxName.Text == "Фамилия И.О.")
-            {
-                MessageBox.Show("Введите в/зв и ФИО дежурного по части (Правый верхний угол)");
-            }
-            else
-            {
-                try
-                {
-                    using (ApplicationContext db = new ApplicationContext()) ///
-                    {
-                        List<Team> teams = db.Teams.ToList();
-
-                        Application app = new Application();
-                        Document wordDoc = app.Documents.Add(Visible: true);
-
-
-                        if (app.Options.Overtype)
-                        {
-                            app.Options.Overtype = false;
-                        }
-
-                        Range title = wordDoc.Paragraphs[1].Range;
-                        title.Text = "Отчет о прибытии";
-                        string str = "Время с подачи сигнала: " + LableSignalTime.Content;                        
-                        title.Text += str;
-                        wordDoc.Paragraphs.Add();
-                        title.Font.Size = 14;
-                        title.Font.Name = "Times New Roman";
-                        title.Font.Bold = 1;
-                        title.ParagraphFormat.Alignment = WdParagraphAlignment.wdAlignParagraphCenter;
-                        title.ParagraphFormat.LineSpacingRule = WdLineSpacing.wdLineSpaceSingle;
-                        title.ParagraphFormat.SpaceAfter = 0;
-                        wordDoc.Paragraphs.Add();
-
-                        Range titelTeams = wordDoc.Paragraphs.Last.Range;
-                        titelTeams.Text = "Подразделения:\n";
-                        titelTeams.Font.Size = 12;
-                        titelTeams.Font.Name = "Times New Roman";
-                        titelTeams.Font.Bold = 1;
-                        titelTeams.ParagraphFormat.Alignment = WdParagraphAlignment.wdAlignParagraphJustify;
-                        wordDoc.Paragraphs.Add();
-
-
-
-                        Range currentRange = wordDoc.Paragraphs.Last.Range;
-                        currentRange.Select();
-                        currentRange.Font.Bold = 0;
-                        currentRange.Font.Size = 10;
-
-                        Table tableTeams = wordDoc.Tables.Add(currentRange, 1, 4);
-                        tableTeams.Columns[2].Width = 50;
-                        tableTeams.AutoFitBehavior(WdAutoFitBehavior.wdAutoFitWindow);
-
-                        tableTeams.Cell(1, 1).Range.Text = "Управление";
-                        foreach (Team team in teams)
-                        {
-                            tableTeams.Cell(1, 1).Range.Text += team.TeamName;
-                            tableTeams.Cell(1, 1).Range.ParagraphFormat.Alignment = WdParagraphAlignment.wdAlignParagraphLeft;
-                        }
-
-                        tableTeams.Cell(1, 2).Range.Text = "- " + labelUprCh20.Content.ToString();
-                        tableTeams.Cell(1, 2).Range.ParagraphFormat.Alignment = WdParagraphAlignment.wdAlignParagraphLeft;
-                        foreach (Team team in teams)
-                        {
-                            tableTeams.Cell(1, 2).Range.Text += "- " + team.Ch20;
-                        }
-
-                        tableTeams.Cell(1, 3).Range.Text = "ВСЕГО: " + LabelArriveCh10.Content.ToString();
-                        tableTeams.Cell(1, 3).Range.Font.Bold = 1;
-                        tableTeams.Cell(1, 3).Range.Font.Size = 24;
-                        tableTeams.Cell(1, 3).VerticalAlignment = WdCellVerticalAlignment.wdCellAlignVerticalCenter;
-                        tableTeams.Cell(1, 4).Range.Text = LabelPercentCh10.Content.ToString();
-                        tableTeams.Cell(1, 4).Range.Font.Bold = 1;
-                        tableTeams.Cell(1, 4).Range.Font.Size = 24;
-                        tableTeams.Cell(1, 4).VerticalAlignment = WdCellVerticalAlignment.wdCellAlignVerticalCenter;
-
-                        wordDoc.Paragraphs.Add();
-
-                        currentRange = wordDoc.Paragraphs.Last.Range;
-                        currentRange.Select();
-                        currentRange.ParagraphFormat.Alignment = WdParagraphAlignment.wdAlignParagraphLeft;
-
-                        Table tableMain = wordDoc.Tables.Add(currentRange, 1, 6);
-                        tableMain.Columns[1].Width = 50;
-                        tableMain.Columns[2].Width = 150;
-                        tableMain.AutoFitBehavior(WdAutoFitBehavior.wdAutoFitWindow);
-
-                        User user = new User();
-                        Rank rank = new Rank();
-
-                        int i = 1;
-                        foreach (MainUser mainUser in db.MainUsers)
-                        {
-                            if (mainUser != null)
+                            switch (type)
                             {
-                                if (mainUser.Ch10 != null || mainUser.Ch15 != null || mainUser.Ch20 != null)
-                                {
-
-                                    user = db.Users.Find(mainUser.UserId);
-                                    rank = db.Ranks.Find(user.RankId);
-                                    tableMain.Rows.Add(tableMain.Rows[i]);
-                                    tableMain.Rows[i].Borders[WdBorderType.wdBorderBottom].LineStyle = WdLineStyle.wdLineStyleSingle;
-                                    tableMain.Cell(i, 1).Range.Text = i.ToString();
-                                    tableMain.Cell(i, 2).Range.Text = rank.rankName;
-                                    tableMain.Cell(i, 3).Range.Text = user.Surname;
-                                    tableMain.Cell(i, 4).Range.Text = user.Name;
-                                    tableMain.Cell(i, 5).Range.Text = user.middleName;
-                                    if (mainUser.Ch15 == null && mainUser.Ch20 == null)
-                                    {
-                                        tableMain.Cell(i, 6).Range.Text = mainUser.Ch10;
-                                    }
-                                    else
-                                    {
-                                        if (mainUser.Ch20 == null)
-                                        {
-                                            tableMain.Cell(i, 6).Range.Text = mainUser.Ch15;
-                                        }
-                                        else
-                                        {
-                                            tableMain.Cell(i, 6).Range.Text = mainUser.Ch20;
-                                        }
-                                    }                                    
-                                    i++;
-                                }
+                                case "ch10":
+                                    tableTeams.Cell(1, 3).Range.Text = "ВСЕГО: " + LabelArriveCh10.Content.ToString();
+                                    break;
+                                case "ch15":
+                                    tableTeams.Cell(1, 3).Range.Text = "ВСЕГО: " + LabelArriveCh15.Content.ToString();
+                                    break;
+                                case "ch20":
+                                    tableTeams.Cell(1, 3).Range.Text = "ВСЕГО: " + LabelArriveCh20.Content.ToString();
+                                    break;
                             }
-                        }
 
-                        wordDoc.Paragraphs.Add();
-                        currentRange = wordDoc.Paragraphs.Last.Range;
-                        currentRange.Select();
-                        str = "Дежурный по части\n" + ComboBoxRank.Text + "\t______________\t\t" + TextBoxName.Text;
-                        currentRange.Text = str;
-
-                        wordDoc.Save();
-
-                        try
-                        {
-                            wordDoc.Close();
-                            app.Quit();
-
-                        }
-                        catch (Exception)
-                        {
-
-                            throw;
-                        }
-
-                    }
-                }
-                catch (Exception)
-                {
-
-                    MessageBox.Show("Возникла ошибка при работе с базой данных. Отчет не выгружен.");
-                }
-            }
-        }
-
-        private void ButtonNoArrive_Click(object sender, RoutedEventArgs e)
-        {
-            if (ComboBoxRank.SelectedIndex == -1 || TextBoxName.Text == "Фамилия И.О.")
-            {
-                MessageBox.Show("Введите в/зв и ФИО дежурного по части (Правый верхний угол)");
-            }
-            else
-            {
-                try
-                {
-                    using (ApplicationContext db = new ApplicationContext()) ///
-                    {
-                        List<Team> teams = db.Teams.ToList();
-
-                        Application app = new Application();
-                        Document wordDoc = app.Documents.Add(Visible: true);
-
-
-                        if (app.Options.Overtype)
-                        {
-                            app.Options.Overtype = false;
-                        }
-
-                        Range title = wordDoc.Paragraphs[1].Range;
-                        string str = "Список не прибывших\n Время с подачи сигнала: " + LableSignalTime.Content;
-                        title.Text = str;
-                        wordDoc.Paragraphs.Add();
-                        title.Font.Size = 14;
-                        title.Font.Name = "Times New Roman";
-                        title.Font.Bold = 1;
-                        title.ParagraphFormat.Alignment = WdParagraphAlignment.wdAlignParagraphCenter;
-                        title.ParagraphFormat.LineSpacingRule = WdLineSpacing.wdLineSpaceSingle;
-                        title.ParagraphFormat.SpaceAfter = 0;
-                        wordDoc.Paragraphs.Add();
-
-                        Range titelTeams = wordDoc.Paragraphs.Last.Range;
-                        titelTeams.Text = "Управление:\n";
-                        titelTeams.Font.Size = 12;
-                        titelTeams.Font.Name = "Times New Roman";
-                        titelTeams.Font.Bold = 1;
-                        titelTeams.ParagraphFormat.Alignment = WdParagraphAlignment.wdAlignParagraphJustify;
-                        wordDoc.Paragraphs.Add();
-
-                        Range currentRange = wordDoc.Paragraphs.Last.Range;
-                        currentRange.Select();
-                        currentRange.Font.Bold = 0;
-                        currentRange.Font.Size = 10;                        
-
-                        currentRange = wordDoc.Paragraphs.Last.Range;
-                        currentRange.Select();
-                        currentRange.ParagraphFormat.Alignment = WdParagraphAlignment.wdAlignParagraphLeft;
-
-                        Table tableMain = wordDoc.Tables.Add(currentRange, 1, 6);
-                        tableMain.Columns[1].Width = 30;
-                        tableMain.Columns[2].Width = 90;
-                        tableMain.AutoFitBehavior(WdAutoFitBehavior.wdAutoFitWindow);
-
-                        User user = new User();
-                        Rank rank = new Rank();
-
-                        int i = 1;
-                        foreach (MainUser mainUser in db.MainUsers)
-                        {
-                            if (mainUser != null)
+                            tableTeams.Cell(1, 3).Range.Font.Bold = 1;
+                            tableTeams.Cell(1, 3).Range.Font.Size = 24;
+                            tableTeams.Cell(1, 3).VerticalAlignment = WdCellVerticalAlignment.wdCellAlignVerticalCenter;
+                            switch (type)
                             {
-                                if (mainUser.Ch10 == null && mainUser.Ch15 == null && mainUser.Ch20 == null && mainUser.StatusId == 0)
-                                {
-
-                                    user = db.Users.Find(mainUser.UserId);
-                                    rank = db.Ranks.Find(user.RankId);
-                                    tableMain.Rows.Add(tableMain.Rows[i]);
-                                    tableMain.Rows[i].Borders[WdBorderType.wdBorderBottom].LineStyle = WdLineStyle.wdLineStyleSingle;
-                                    tableMain.Cell(i, 1).Range.Text = i.ToString();
-                                    tableMain.Cell(i, 2).Range.Text = rank.rankName;
-                                    tableMain.Cell(i, 3).Range.Text = user.Surname;
-                                    tableMain.Cell(i, 4).Range.Text = user.Name;
-                                    tableMain.Cell(i, 5).Range.Text = user.middleName;
-                                    tableMain.Cell(i, 6).Range.Text = user.position;
-                                    i++;
-                                }
+                                case "ch10":
+                                    tableTeams.Cell(1, 4).Range.Text = LabelPercentCh10.Content.ToString();
+                                    break;
+                                case "ch15":
+                                    tableTeams.Cell(1, 4).Range.Text = LabelPercentCh15.Content.ToString();
+                                    break;
+                                case "ch20":
+                                    tableTeams.Cell(1, 4).Range.Text = LabelPercentCh20.Content.ToString();
+                                    break;
                             }
+
+                            tableTeams.Cell(1, 4).Range.Font.Bold = 1;
+                            tableTeams.Cell(1, 4).Range.Font.Size = 24;
+                            tableTeams.Cell(1, 4).VerticalAlignment = WdCellVerticalAlignment.wdCellAlignVerticalCenter;
+
+                            wordDoc.Paragraphs.Add();
                         }
-
-                        wordDoc.Paragraphs.Add();
-                        currentRange = wordDoc.Paragraphs.Last.Range;
-                        currentRange.Select();
-                        str = "Дежурный по части\n" + ComboBoxRank.Text + "\t______________\t\t" + TextBoxName.Text;
-                        currentRange.Text = str;
-
-                        wordDoc.Save();
-
-                        try
-                        {
-                            wordDoc.Close();
-                            app.Quit();
-
-                        }
-                        catch (Exception)
-                        {
-
-                            throw;
-                        }
-
-                    }
-                }
-                catch (Exception)
-                {
-
-                    MessageBox.Show("Возникла ошибка при работе с базой данных. Отчет не выгружен.");
-                }
-            }
-        }
-
-        private void ButtonGoodReason_Click(object sender, RoutedEventArgs e)
-        {
-            if (ComboBoxRank.SelectedIndex == -1 || TextBoxName.Text == "Фамилия И.О.")
-            {
-                MessageBox.Show("Введите в/зв и ФИО дежурного по части (Правый верхний угол)");
-            }
-            else
-            {
-                try
-                {
-                    using (ApplicationContext db = new ApplicationContext()) ///
-                    {
-                        List<Team> teams = db.Teams.ToList();
-
-                        Application app = new Application();
-                        Document wordDoc = app.Documents.Add(Visible: true);
-
-
-                        if (app.Options.Overtype)
-                        {
-                            app.Options.Overtype = false;
-                        }
-
-                        Range title = wordDoc.Paragraphs[1].Range;                        
-                        title.Text = "Список отсутствующих по уважительной причине";
-                        wordDoc.Paragraphs.Add();
-                        title.Font.Size = 14;
-                        title.Font.Name = "Times New Roman";
-                        title.Font.Bold = 1;
-                        title.ParagraphFormat.Alignment = WdParagraphAlignment.wdAlignParagraphCenter;
-                        title.ParagraphFormat.LineSpacingRule = WdLineSpacing.wdLineSpaceSingle;
-                        title.ParagraphFormat.SpaceAfter = 0;
-                        wordDoc.Paragraphs.Add();
-
-                        Range titelTeams = wordDoc.Paragraphs.Last.Range;
-                        titelTeams.Text = "Управление:\n";
-                        titelTeams.Font.Size = 12;
-                        titelTeams.Font.Name = "Times New Roman";
-                        titelTeams.Font.Bold = 1;
-                        titelTeams.ParagraphFormat.Alignment = WdParagraphAlignment.wdAlignParagraphJustify;
-                        wordDoc.Paragraphs.Add();
-
-                        Range currentRange = wordDoc.Paragraphs.Last.Range;
-                        currentRange.Select();
-                        currentRange.Font.Bold = 0;
-                        currentRange.Font.Size = 10;
 
                         currentRange = wordDoc.Paragraphs.Last.Range;
                         currentRange.Select();
                         currentRange.ParagraphFormat.Alignment = WdParagraphAlignment.wdAlignParagraphLeft;
 
-                        Table tableMain = wordDoc.Tables.Add(currentRange, 1, 6);
+                        if (type == "goodReason" || type == "noArrived")
+                        {
+                            Table table = wordDoc.Tables.Add(currentRange, 1, 5);
+                            table.Columns[1].Width = 50;
+                            table.Columns[2].Width = 120;
+                            table.AutoFitBehavior(WdAutoFitBehavior.wdAutoFitWindow);
+                        }
+                        else
+                        {
+                            Table table = wordDoc.Tables.Add(currentRange, 1, 6);
+                            table.Columns[1].Width = 50;
+                            table.Columns[2].Width = 120;
+                            table.AutoFitBehavior(WdAutoFitBehavior.wdAutoFitWindow);
+                        }
+
+                        Table tableMain = wordDoc.Tables[wordDoc.Tables.Count];
                         tableMain.Columns[1].Width = 50;
                         tableMain.Columns[2].Width = 150;
                         tableMain.AutoFitBehavior(WdAutoFitBehavior.wdAutoFitWindow);
@@ -1655,21 +1076,109 @@ namespace Uchet
                         {
                             if (mainUser != null)
                             {
-                                if (mainUser.StatusId != 0 && mainUser.StatusId != 5) //0 - На лицо, 5 - ВАКАНТ
+                                switch (type)
                                 {
-                                    user = db.Users.Find(mainUser.UserId);
-                                    rank = db.Ranks.Find(user.RankId);
-                                    status = db.Statuses.Find(mainUser.StatusId);
-                                    tableMain.Rows.Add(tableMain.Rows[i]);
-                                    tableMain.Rows[i].Borders[WdBorderType.wdBorderBottom].LineStyle = WdLineStyle.wdLineStyleSingle;
-                                    tableMain.Cell(i, 1).Range.Text = i.ToString();
-                                    tableMain.Cell(i, 2).Range.Text = rank.rankName;
-                                    tableMain.Cell(i, 3).Range.Text = user.Surname;
-                                    tableMain.Cell(i, 4).Range.Text = user.Name;
-                                    tableMain.Cell(i, 5).Range.Text = user.middleName;
-                                    tableMain.Cell(i, 5).Range.Text = status.statusName;
-                                    i++;
-                                }
+                                    case "ch10":
+                                        if (mainUser.Ch10 != null)
+                                        {
+
+                                            user = db.Users.Find(mainUser.UserId);
+                                            rank = db.Ranks.Find(user.RankId);
+                                            tableMain.Rows.Add(tableMain.Rows[i]);
+                                            tableMain.Rows[i].Borders[WdBorderType.wdBorderBottom].LineStyle = WdLineStyle.wdLineStyleSingle;
+                                            tableMain.Cell(i, 1).Range.Text = i.ToString();
+                                            tableMain.Cell(i, 2).Range.Text = rank.rankName;
+                                            tableMain.Cell(i, 3).Range.Text = user.Surname;
+                                            tableMain.Cell(i, 4).Range.Text = user.Name;
+                                            tableMain.Cell(i, 5).Range.Text = user.middleName;
+                                            tableMain.Cell(i, 6).Range.Text = mainUser.Ch10;
+                                            i++;
+                                        }
+                                        break;
+                                    case "ch15":
+                                        if (mainUser.Ch15 != null)
+                                        {
+                                            user = db.Users.Find(mainUser.UserId);
+                                            rank = db.Ranks.Find(user.RankId);
+                                            tableMain.Rows.Add(tableMain.Rows[i]);
+                                            tableMain.Rows[i].Borders[WdBorderType.wdBorderBottom].LineStyle = WdLineStyle.wdLineStyleSingle;
+                                            tableMain.Cell(i, 1).Range.Text = i.ToString();
+                                            tableMain.Cell(i, 2).Range.Text = rank.rankName;
+                                            tableMain.Cell(i, 3).Range.Text = user.Surname;
+                                            tableMain.Cell(i, 4).Range.Text = user.Name;
+                                            tableMain.Cell(i, 5).Range.Text = user.middleName;
+                                            tableMain.Cell(i, 6).Range.Text = mainUser.Ch15;
+                                            i++;
+                                        }
+                                        break;
+                                    case "ch20":
+                                        if (mainUser.Ch20 != null)
+                                        {
+                                            user = db.Users.Find(mainUser.UserId);
+                                            rank = db.Ranks.Find(user.RankId);
+                                            tableMain.Rows.Add(tableMain.Rows[i]);
+                                            tableMain.Rows[i].Borders[WdBorderType.wdBorderBottom].LineStyle = WdLineStyle.wdLineStyleSingle;
+                                            tableMain.Cell(i, 1).Range.Text = i.ToString();
+                                            tableMain.Cell(i, 2).Range.Text = rank.rankName;
+                                            tableMain.Cell(i, 3).Range.Text = user.Surname;
+                                            tableMain.Cell(i, 4).Range.Text = user.Name;
+                                            tableMain.Cell(i, 5).Range.Text = user.middleName;
+                                            tableMain.Cell(i, 6).Range.Text = mainUser.Ch20;
+                                            i++;
+                                        }
+                                        break;
+                                    case "arrived":
+                                        if (mainUser.Ch10 != null || mainUser.Ch15 != null || mainUser.Ch20 != null)
+                                        {
+                                            rank = db.Ranks.Find(user.RankId);
+                                            tableMain.Rows.Add(tableMain.Rows[i]);
+                                            tableMain.Rows[i].Borders[WdBorderType.wdBorderBottom].LineStyle = WdLineStyle.wdLineStyleSingle;
+                                            tableMain.Cell(i, 1).Range.Text = i.ToString();
+                                            tableMain.Cell(i, 2).Range.Text = rank.rankName;
+                                            tableMain.Cell(i, 3).Range.Text = user.Surname;
+                                            tableMain.Cell(i, 4).Range.Text = user.Name;
+                                            tableMain.Cell(i, 5).Range.Text = user.MiddleName;
+                                            tableMain.Cell(i, 6).Range.Text = mainUser.Time;
+                                            i++;
+                                        }
+                                        break;
+                                    case "noArrived":
+                                        if (mainUser.StatusId == 1 &&
+                                            mainUser.Ch10 is null && mainUser.Ch15 is null && mainUser.Ch20 is null)
+                                        {
+                                            rank = db.Ranks.Find(user.RankId);
+                                            tableMain.Rows.Add(tableMain.Rows[i]);
+                                            tableMain.Rows[i].Borders[WdBorderType.wdBorderBottom].LineStyle = WdLineStyle.wdLineStyleSingle;
+                                            tableMain.Cell(i, 1).Range.Text = i.ToString();
+                                            tableMain.Cell(i, 2).Range.Text = rank.rankName;
+                                            tableMain.Cell(i, 3).Range.Text = user.Surname;
+                                            tableMain.Cell(i, 4).Range.Text = user.Name;
+                                            tableMain.Cell(i, 5).Range.Text = user.MiddleName;
+                                            i++;
+                                        }
+                                        break;
+                                    case "goodReason":
+                                        if (mainUser != null)
+                                        {
+                                            if (mainUser.StatusId != 1 && mainUser.StatusId != 6) //1 - На лицо, 6 - ВАКАНТ
+                                            {
+                                                rank = db.Ranks.Find(user.RankId);
+                                                status = db.Statuses.Find(mainUser.StatusId);
+                                                tableMain.Rows.Add(tableMain.Rows[i]);
+                                                tableMain.Rows[i].Borders[WdBorderType.wdBorderBottom].LineStyle = WdLineStyle.wdLineStyleSingle;
+                                                tableMain.Cell(i, 1).Range.Text = i.ToString();
+                                                tableMain.Cell(i, 2).Range.Text = rank.rankName;
+                                                tableMain.Cell(i, 3).Range.Text = user.Surname;
+                                                tableMain.Cell(i, 4).Range.Text = user.Name;
+                                                tableMain.Cell(i, 5).Range.Text = user.MiddleName;
+                                                tableMain.Cell(i, 5).Range.Text = status.statusName;
+                                                i++;
+                                            }
+                                        }
+                                        break;
+                                    default:
+                                        break;
+                                }                                
                             }
                         }
 
@@ -1701,6 +1210,36 @@ namespace Uchet
                     MessageBox.Show("Возникла ошибка при работе с базой данных. Отчет не выгружен.");
                 }
             }
+        }
+
+        private void ButtonCh10_Click(object sender, RoutedEventArgs e)
+        {
+            WordReport("ch10");
+        }
+
+        private void ButtonCh15_Click(object sender, RoutedEventArgs e)
+        {
+            WordReport("ch15");
+        }
+
+        private void ButtonCh20_Click(object sender, RoutedEventArgs e)
+        {
+            WordReport("ch20");
+        }
+
+        private void ButtonArrive_Click(object sender, RoutedEventArgs e)
+        {
+            WordReport("arrived");
+        }
+
+        private void ButtonNoArrive_Click(object sender, RoutedEventArgs e)
+        {
+            WordReport("noArrived");
+        }
+
+        private void ButtonGoodReason_Click(object sender, RoutedEventArgs e)
+        {
+            WordReport("goodReason");
         }
 
         private void ButtonAbout_Click(object sender, RoutedEventArgs e)

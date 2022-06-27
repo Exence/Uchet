@@ -28,9 +28,9 @@ namespace Uchet
     /// <summary>
     /// Логика взаимодействия для EditTableWindow.xaml
     /// </summary>
-    
-    
-    
+
+
+
     public partial class EditTableWindow : Window
     {
 
@@ -48,7 +48,7 @@ namespace Uchet
                     statuses = db.Statuses.ToList();
                     ranks = db.Ranks.ToList();
                 }
-                
+
             }
             catch (Exception)
             {
@@ -59,7 +59,7 @@ namespace Uchet
 
         }
 
-       
+
 
         private void RefreshGridUsers()
         {
@@ -82,7 +82,7 @@ namespace Uchet
 
                     foreach (MainUser mainUser in mainUsers)
                     {
-                        mainId = mainUser.id;  
+                        mainId = mainUser.id;
                         num = mainUser.Num;
                         userId = mainUser.UserId;
                         usr = db.Users.Where(u => u.id == userId).FirstOrDefault();
@@ -98,9 +98,9 @@ namespace Uchet
                         editUsers.Add(new EditUser(mainId, userId, num, name, surname, middleName, statusName, rankName, position));
                     }
                 }
-                
+
                 GridTable.ItemsSource = editUsers;
-               
+
 
                 statusColumn.ItemsSource = statuses;
                 statusColumn.DisplayMemberPath = "statusName";
@@ -122,10 +122,10 @@ namespace Uchet
         }
 
         private void EditUsers_ListChanged(object sender, ListChangedEventArgs e)
-        {            
+        {
             if (e.ListChangedType == ListChangedType.ItemChanged)
             {
-                
+
                 EditUser selectedRow = GridTable.SelectedItem as EditUser;
                 Rank rank = null;
                 User user = null;
@@ -136,20 +136,20 @@ namespace Uchet
                     using (ApplicationContext db = new ApplicationContext())
                     {
                         MainUser mainUser = db.MainUsers.Find(selectedRow.mainId);
-                        
+
                         if (mainUser != null)
                         {
                             user = db.Users.Where(u => u.id == mainUser.UserId).FirstOrDefault();
-                            status = db.Statuses.Where(s => s.statusName == selectedRow.statusName).FirstOrDefault();                            
+                            status = db.Statuses.Where(s => s.statusName == selectedRow.statusName).FirstOrDefault();
                             rank = db.Ranks.Where(r => r.rankName == selectedRow.rankName).FirstOrDefault();
 
                             user.Name = selectedRow.name;
                             user.Surname = selectedRow.surname;
                             user.MiddleName = selectedRow.middleName;
                             if (mainUser.StatusId != status.id)
-                            {                              
+                            {
 
-                                if (status.id == 5)
+                                if (status.id == 6)
                                 {
                                     isRefreshNeeded = true;
                                     MessageBoxResult result = MessageBox.Show("Вы выбрали статус 'ВАКАНТ'. Очистить поле ФИО?", "Проверка данных.Вакант", MessageBoxButton.YesNo, MessageBoxImage.Warning, MessageBoxResult.Yes);
@@ -158,31 +158,31 @@ namespace Uchet
                                         user.Name = null;
                                         user.Surname = null;
                                         user.MiddleName = null;
-                                    }                                    
+                                    }
                                     mainUser.StatusId = status.id;
                                 }
                                 else
                                 {
-                                    
+
                                     if (selectedRow.name == null || selectedRow.surname == null || selectedRow.middleName == null)
                                     {
-                                        MessageBox.Show("Введите ФИО");                                        
+                                        MessageBox.Show("Введите ФИО");
                                     }
                                     else
                                     {
                                         mainUser.StatusId = status.id;
                                     }
-                                }   
-                            }                                                        
+                                }
+                            }
                             user.Position = selectedRow.position;
                             user.RankId = rank.id;
                         }
                         db.SaveChanges();
                         if (isRefreshNeeded) { RefreshGridUsers(); }
-                        
+
                     }
-                    
-                    
+
+
 
                 }
                 catch (Exception)
@@ -197,7 +197,7 @@ namespace Uchet
         private void GridTable_Loaded(object sender, RoutedEventArgs e)
         {
             RefreshGridUsers();
-            
+
 
         }
 
@@ -207,18 +207,18 @@ namespace Uchet
             {
                 db.SaveChanges();
                 Close();
-                
+
             }
         }
 
-         private void GridTable_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
+        private void GridTable_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
         {
             RefreshGridUsers();
         }
 
         private void Window_Closed(object sender, EventArgs e)
         {
-            
+
             Application.Current.MainWindow.Show();
 
         }
@@ -227,7 +227,7 @@ namespace Uchet
         {
             GridTable.CommitEdit();
             if (GridTable.SelectedIndex > 0)
-            {                
+            {
                 EditUser selectedRow = GridTable.SelectedItem as EditUser;
                 try
                 {
@@ -245,11 +245,11 @@ namespace Uchet
                                 mainUser = db.MainUsers.Find(selectedRow.mainId);
                                 mainUser.Num += 1;
                             }
-                            
+
                         }
                         db.SaveChanges();
                         RefreshGridUsers();
-                        
+
                     }
 
 
@@ -265,7 +265,7 @@ namespace Uchet
 
         private void ButtonDown_Click(object sender, RoutedEventArgs e)
         {
-            
+
             if (GridTable.SelectedIndex != GridTable.Items.Count - 1)
             {
                 EditUser selectedRow = GridTable.SelectedItem as EditUser;
@@ -285,7 +285,7 @@ namespace Uchet
                         }
                         db.SaveChanges();
                         RefreshGridUsers();
-                        
+
                     }
 
                 }
@@ -354,12 +354,12 @@ namespace Uchet
                             }
                         }
                         currenUser.Num += i;
-                        
+
                         db.SaveChanges();
 
                         GridTable.SelectedIndex = GridTable.Items.Count - 1;
                         RefreshGridUsers();
-                        
+
 
                     }
                 }
@@ -383,10 +383,10 @@ namespace Uchet
                     User user = new User(1);
                     db.Users.Add(user);
                     db.SaveChanges();
-                    user = db.Users.OrderBy(u => u.id).ToList().Last();                    
+                    user = db.Users.OrderBy(u => u.id).ToList().Last();
                     MainUser mainUser = new MainUser(user.id, num, 5);
                     db.MainUsers.Add(mainUser);
-                    db.SaveChanges();                    
+                    db.SaveChanges();
                     RefreshGridUsers();
                     GridTable.SelectedIndex = GridTable.Items.Count - 1;
 
@@ -401,40 +401,46 @@ namespace Uchet
 
         private void ButtonDelLast_Click(object sender, RoutedEventArgs e)
         {
-            GridTable.SelectedIndex = GridTable.Items.Count - 1;
-            EditUser selectedRow = GridTable.SelectedItem as EditUser;
-            MessageBoxResult result = MessageBox.Show("Вы уверены, что хотите удалить данную запись?\n\n"
-                                                        + selectedRow.num + ". " 
-                                                        + selectedRow.rankName + " "
-                                                        + selectedRow.surname + " "
-                                                        + selectedRow.name + " "
-                                                        + selectedRow.middleName + "\n\n"
-                                                        + "Отменить данный выбор будет НЕВОЗМОЖНО!", 
-                                                        "Проверка данных.Удаление последней записи", 
-                                                        MessageBoxButton.YesNo, MessageBoxImage.Warning, MessageBoxResult.Yes);
-            if (result == MessageBoxResult.Yes)
+            if (GridTable.Items.Count != 1)
             {
-                try
+                GridTable.SelectedIndex = GridTable.Items.Count - 1;
+                EditUser selectedRow = GridTable.SelectedItem as EditUser;
+                MessageBoxResult result = MessageBox.Show("Вы уверены, что хотите удалить данную запись?\n\n"
+                                                            + selectedRow.num + ". "
+                                                            + selectedRow.rankName + " "
+                                                            + selectedRow.surname + " "
+                                                            + selectedRow.name + " "
+                                                            + selectedRow.middleName + "\n\n"
+                                                            + "Отменить данный выбор будет НЕВОЗМОЖНО!",
+                                                            "Проверка данных.Удаление последней записи",
+                                                            MessageBoxButton.YesNo, MessageBoxImage.Warning, MessageBoxResult.Yes);
+                if (result == MessageBoxResult.Yes)
                 {
-                    using (ApplicationContext db = new ApplicationContext())
-                    {                        
-                        MainUser mainUser = db.MainUsers.Find(selectedRow.mainId);
-                        User user = db.Users.Find(mainUser.UserId);
-                        db.Users.Remove(user);
-                        db.MainUsers.Remove(mainUser);
-                        db.SaveChanges();
-                        GridTable.SelectedIndex = GridTable.Items.Count - 2;
-                        RefreshGridUsers();
+                    try
+                    {
+                        using (ApplicationContext db = new ApplicationContext())
+                        {
+                            MainUser mainUser = db.MainUsers.Find(selectedRow.mainId);
+                            User user = db.Users.Find(mainUser.UserId);
+                            db.Users.Remove(user);
+                            db.MainUsers.Remove(mainUser);
+                            db.SaveChanges();
+                            GridTable.SelectedIndex = GridTable.Items.Count - 2;
+                            RefreshGridUsers();
+                        }
+                    }
+                    catch (Exception)
+                    {
+                        MessageBox.Show("Возникла ошибка при работе с базой данных. Окно будет закрыто.");
+                        Close();
                     }
                 }
-                catch (Exception)
-                {
-                    MessageBox.Show("Возникла ошибка при работе с базой данных. Окно будет закрыто.");
-                    Close();
-                }
-            }
-                
-        }
 
+            } else
+            {
+                MessageBox.Show("Нельзя удалить последний элемент в таблице!");
+            }
+
+        }
     }
 }
