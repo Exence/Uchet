@@ -75,7 +75,7 @@ namespace Uchet
             Rank rank = null;
             User usr = null;
             int selectedIndex = GridUsers.SelectedIndex;
-            int num, onService = 0, absent = 0, shouldCome = 0;
+            int num, onService = 0, absent = 0, ch10 = 0, ch15 = 0, ch20 = 0, noArrived = 0;
             string rankName, fName;
             bool isArrive;
 
@@ -83,11 +83,10 @@ namespace Uchet
             {
                 using (ApplicationContext db = new ApplicationContext())
                 {
-
                     List<MainUser> mainUsers = db.MainUsers.OrderBy(mu => mu.Num).ToList();
+                    Team team = db.Teams.Find(1);
 
-                    labelUprOnList.Content = mainUsers.Count.ToString();
-                    shouldCome = mainUsers.Count;
+                    team.OnList = mainUsers.Count;                    
 
                     foreach (MainUser mainUser in mainUsers)
                     {
@@ -105,6 +104,7 @@ namespace Uchet
                             else
                             {
                                 isArrive = false;
+                                noArrived++;
                             }
 
                             arriveUsers.Add(new ArriveUser(num, rankName, fName, isArrive));
@@ -119,39 +119,41 @@ namespace Uchet
                             {
                                 absent += 1;
                             }
-
                         }
 
-
+                        if (mainUser.Ch10 != null) { ch10++; }
+                        else if (mainUser.Ch15 != null) { ch15++; }
+                        else if (mainUser.Ch20 != null) { ch20++; }
                     }
+
+                    team.OnFace = team.OnList - absent - onService;
+                    team.OnService = onService;
+                    team.Absent = absent;
+                    team.ShouldCome = team.OnFace - ch10 - ch15 - ch20;
+                    team.Ch10 = ch10;
+                    team.Ch15 = ch15;
+                    team.Ch20 = ch20;
+                    team.NoArrived = noArrived;
+
+                    db.SaveChanges();
                 }
 
                 GridUsers.ItemsSource = arriveUsers;
                 GridUsers.SelectedIndex = selectedIndex;
 
-                shouldCome -= absent + onService;
-                labelUprOnService.Content = onService.ToString();
-                labelUprAbsent.Content = absent.ToString();
-                labelUprShouldCome.Content = shouldCome.ToString();
-                labelUprOnFace.Content = arriveUsers.Count.ToString();
 
                 arriveUsers.ListChanged += ArriveUsers_ListChanged;
-                RefreshGridTeams();
-
-                
+                RefreshGridTeams();                
             }
             catch (Exception)
             {
                 MessageBox.Show("Возникла ошибка при работе с базой данных. Продолжение невозможно.");
                 Close();
             }
-
-
         }
         private void GridUsers_Loaded(object sender, RoutedEventArgs e)
         {
             RefreshGridUsers();
-
         }
 
         private void CheckArrive(DateTime currentTime)
@@ -162,93 +164,67 @@ namespace Uchet
                 {
                     ArriveUser selectedRow = GridUsers.SelectedItem as ArriveUser;
                     MainUser mainUser = db.MainUsers.Where(mu => mu.Num == selectedRow.num).FirstOrDefault();
+                    Team team = db.Teams.Find(1);
+
                     if (currentTime < Convert.ToDateTime("01:00:00"))
                     {
-                        SummLabelInt(LabelArriveCh10, LabelArriveCh10, 1);
-                        SummLabelInt(LabelArriveCh15, LabelArriveCh15, 1);
-                        SummLabelInt(LabelArriveCh20, LabelArriveCh20, 1);
-
-                        SummLabelInt(labelUprCh10, labelUprCh10, 1);
-                        SummLabelInt(labelUprCh15, labelUprCh15, 1);
-                        SummLabelInt(labelUprCh20, labelUprCh20, 1);
-
-                        FindPercent(LabelPercentCh10, LabelArriveCh10, labelShouldCome);
-                        FindPercent(LabelPercentCh15, LabelArriveCh15, labelShouldCome);
-                        FindPercent(LabelPercentCh20, LabelArriveCh20, labelShouldCome);
-
                         mainUser.Ch10 = currentTime.ToString(@"hh\:mm\:ss");
-
+                        team.Ch10++;
+                        team.NoArrived--;
                     }
                     else if (currentTime < Convert.ToDateTime("01:30:00") && (currentTime > Convert.ToDateTime("01:00:00")))
                     {
-                        SummLabelInt(LabelArriveCh15, LabelArriveCh15, 1);
-                        SummLabelInt(LabelArriveCh20, LabelArriveCh20, 1);
-
-                        SummLabelInt(labelUprCh15, labelUprCh15, 1);
-                        SummLabelInt(labelUprCh20, labelUprCh20, 1);
-
-                        FindPercent(LabelPercentCh15, LabelArriveCh15, labelShouldCome);
-                        FindPercent(LabelPercentCh20, LabelArriveCh20, labelShouldCome);
-
                         mainUser.Ch15 = currentTime.ToString(@"hh\:mm\:ss");
+                        team.Ch15++;
+                        team.NoArrived--;
                     }
                     else if (currentTime < Convert.ToDateTime("02:00:00"))
-                    {
-                        SummLabelInt(LabelArriveCh20, LabelArriveCh20, 1);
-                        SummLabelInt(labelUprCh20, labelUprCh20, 1);
-
+                    {                        
                         mainUser.Ch20 = currentTime.ToString(@"hh\:mm\:ss");
-                    }
+                        team.Ch20++;
+                        team.NoArrived--;
+                    }                    
 
-                    SummLabelInt(labelUprNoArrive, labelUprNoArrive, -1);
-
-                    FindPercent(LabelPercentCh20, LabelArriveCh20, labelShouldCome);
-
-                    db.SaveChanges();
+                    db.SaveChanges();                    
                 }
             }
             catch (Exception)
             {
                 MessageBox.Show("Возникла ошибка при работе с базой данных. Продолжение невозможно.");
                 Close();
-            }
-
-
-
+            }            
         }
         private void UncheckArrive()
         {
-
             try
             {
                 using (ApplicationContext db = new ApplicationContext())
                 {
                     ArriveUser selectedRow = GridUsers.SelectedItem as ArriveUser;
                     MainUser mainUser = db.MainUsers.Where(mu => mu.Num == selectedRow.num).FirstOrDefault();
+                    Team team = db.Teams.Find(1);
+
 
                     if (mainUser.Ch10 != null)
                     {
-                        SummLabelInt(LabelArriveCh10, LabelArriveCh10, -1);
-                        SummLabelInt(LabelArriveCh15, LabelArriveCh15, -1);
-                        SummLabelInt(LabelArriveCh20, LabelArriveCh20, -1);
                         mainUser.Ch10 = null;
-                    }
-                    else if (mainUser.Ch15 != null)
+                        team.Ch10--;
+                        team.NoArrived++;
+                    } else if (mainUser.Ch15 != null)
                     {
-                        SummLabelInt(LabelArriveCh15, LabelArriveCh15, -1);
-                        SummLabelInt(LabelArriveCh20, LabelArriveCh20, -1);
                         mainUser.Ch15 = null;
+                        team.Ch15--;
+                        team.NoArrived++;
                     }
                     else if (mainUser.Ch20 != null)
                     {
-                        SummLabelInt(LabelArriveCh20, LabelArriveCh20, -1);
                         mainUser.Ch20 = null;
-                    }
-
-                    SummLabelInt(labelUprNoArrive, labelUprNoArrive, 1);
-
+                        team.Ch20--;
+                        team.NoArrived++;
+                    }                    
+                   
                     db.SaveChanges();
-                }
+                }                
             }
             catch (Exception)
             {
@@ -289,13 +265,13 @@ namespace Uchet
                         }
                         db.SaveChanges();
                     }
-
                 }
                 catch (Exception)
                 {
                     MessageBox.Show("Возникла ошибка при работе с базой данных. Продолжение невозможно.");
                     Close();
                 }
+                RefreshGridTeams();
             }
         }
 
@@ -325,12 +301,10 @@ namespace Uchet
             LabelPercentCh20.Content = "0,00%";
             labelUprNoArrive.Content = labelUprShouldCome.Content;
 
-
             try
             {
                 using (ApplicationContext db = new ApplicationContext())
                 {
-
                     foreach (MainUser mainUser in db.MainUsers)
                     {
                         mainUser.ArriveStatus = 0;
@@ -351,7 +325,6 @@ namespace Uchet
             }
             catch (Exception)
             {
-
                 MessageBox.Show("Возникла ошибка при работе с базой данных. Продолжение невозможно.");
                 Close();
             }
@@ -375,7 +348,6 @@ namespace Uchet
                 MessageBox.Show("Возникла ошибка при работе с базой данных. Продолжение невозможно.");
                 Close();
             }
-
         }
 
         private void TextBoxName_GotFocus(object sender, RoutedEventArgs e)
@@ -445,7 +417,22 @@ namespace Uchet
                 {
                     foreach (Team team in db.Teams)
                     {
-                        teams.Add(team);
+                        if (team.id != 1)
+                        {
+                            teams.Add(team);                            
+                        } else
+                        {
+                            labelUprOnList.Content = team.OnList.ToString();
+                            labelUprOnFace.Content = team.OnFace.ToString();
+                            labelUprOnService.Content = team.OnService.ToString();
+                            labelUprAbsent.Content = team.Absent.ToString();
+                            labelUprCh10.Content = team.Ch10.ToString();                            
+                            labelUprCh15.Content = team.Ch15.ToString();
+                            labelUprCh20.Content = team.Ch20.ToString();
+                            labelUprNoArrive.Content = team.NoArrived.ToString();
+                            labelUprShouldCome.Content = team.ShouldCome.ToString();
+                        }
+
                         onList += team.OnList;
                         onFace += team.OnFace;
                         onService += team.OnService;
@@ -455,19 +442,30 @@ namespace Uchet
                         ch20 += team.Ch20;
                         noArrived += team.NoArrived;
                         shouldCome += team.ShouldCome;
+
                     }
 
                     DataGridTeam.ItemsSource = teams;
-                    SummLabelInt(labelOnList, labelUprOnList, onList);
-                    SummLabelInt(labelOnFace, labelUprOnFace, onFace);
-                    SummLabelInt(labelOnService, labelUprOnService, onService);
-                    SummLabelInt(labelAbsent, labelUprAbsent, absent);
-                    SummLabelInt(labelCh10, labelUprCh10, ch10);
-                    SummLabelInt(labelCh15, labelUprCh15, ch15);
-                    SummLabelInt(labelCh20, labelUprCh20, ch20);
-                    SummLabelInt(labelNoArrive, labelUprNoArrive, noArrived);
-                    SummLabelInt(labelShouldCome, labelUprShouldCome, shouldCome);
 
+                    labelOnList.Content = onList.ToString();
+                    labelOnList.Content = onList.ToString();
+                    labelOnFace.Content =onFace.ToString();
+                    labelOnService.Content = onService.ToString();
+                    labelAbsent.Content = absent.ToString();
+                    labelCh10.Content = ch10.ToString();
+                    LabelArriveCh10.Content = ch10.ToString();
+                    labelCh15.Content = ch15.ToString();
+                    LabelArriveCh15.Content = ch15.ToString();
+                    labelCh20.Content = ch20.ToString();
+                    LabelArriveCh20.Content = ch20.ToString();
+                    labelNoArrive.Content = noArrived.ToString();
+                    labelShouldCome.Content = shouldCome.ToString();
+
+                    
+
+                    FindPercent(LabelPercentCh10, LabelArriveCh10, labelShouldCome);
+                    FindPercent(LabelPercentCh15, LabelArriveCh15, labelShouldCome);
+                    FindPercent(LabelPercentCh20, LabelArriveCh20, labelShouldCome);
                 }
                 DataGridTeam.SelectedIndex = selectedIndex;
 
@@ -486,8 +484,6 @@ namespace Uchet
 
         private void Teams_ListChanged(object sender, ListChangedEventArgs e)
         {
-
-
             if (e.ListChangedType == ListChangedType.ItemChanged)
             {
                 Team selectedRow = DataGridTeam.SelectedItem as Team;
@@ -527,19 +523,15 @@ namespace Uchet
 
                             team.NoArrived = selectedRow.ShouldCome - team.Ch20;
                             //db.Entry(team).State = EntityState.Modified;
-
                         }
                         db.SaveChanges();
-
                     }
-
                 }
                 catch (Exception)
                 {
                     MessageBox.Show("Возникла ошибка при работе с базой данных. Продолжение невозможно.");
                     Close();
                 }
-
             }
             if (e.ListChangedType == ListChangedType.ItemDeleted)
             {
@@ -549,7 +541,6 @@ namespace Uchet
                     {
                         db.SaveChanges();
                     }
-
                 }
                 catch (Exception)
                 {
@@ -621,7 +612,6 @@ namespace Uchet
                 TextBoxHours.Text = "00";
             else if (TextBoxHours.Text.Length == 1)
                 TextBoxHours.Text = "0" + TextBoxHours.Text;
-
         }
 
         private void TextBoxMinutes_GotFocus(object sender, RoutedEventArgs e)
@@ -783,8 +773,6 @@ namespace Uchet
                                             CheckArrive(parsedString.timeAfterSignal);
                                         }
                                     }
-
-
                                 }
                                 db.SaveChanges();
                                 RefreshGridUsers();
@@ -794,11 +782,9 @@ namespace Uchet
                         {
                             MessageBox.Show(ex.Message);
 
-
                             MessageBox.Show("Возникла ошибка при работе с базой данных. Строка не добавлена.");
                             continue;
                         }
-
                     }
                     i++;
                 }
@@ -856,20 +842,8 @@ namespace Uchet
         private void ButtonEditUsers_Click(object sender, RoutedEventArgs e)
         {
             EditTableWindow editTableWindow = new EditTableWindow();
-            Hide();
             editTableWindow.ShowDialog();
-
-
-        }
-
-        private void ComboBoxRank_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-
-        }
-
-        private void Window_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
-        {
-            RefreshGridUsers();
+            RefreshGridUsers();            
         }
 
         private void DataGridTeam_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
@@ -1081,7 +1055,6 @@ namespace Uchet
                                     case "ch10":
                                         if (mainUser.Ch10 != null)
                                         {
-
                                             user = db.Users.Find(mainUser.UserId);
                                             rank = db.Ranks.Find(user.RankId);
                                             tableMain.Rows.Add(tableMain.Rows[i]);

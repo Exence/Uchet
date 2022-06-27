@@ -173,6 +173,15 @@ namespace Uchet
                                         mainUser.StatusId = status.id;
                                     }
                                 }
+
+                                if (status.id != 1 && mainUser.ArriveStatus == 1)
+                                {
+                                    mainUser.ArriveStatus = 0;
+                                    mainUser.time = string.Empty;
+                                    mainUser.Ch10 = null;
+                                    mainUser.Ch15 = null;
+                                    mainUser.Ch20 = null;
+                                }
                             }
                             user.Position = selectedRow.position;
                             user.RankId = rank.id;
@@ -197,8 +206,6 @@ namespace Uchet
         private void GridTable_Loaded(object sender, RoutedEventArgs e)
         {
             RefreshGridUsers();
-
-
         }
 
         private void ButtonSave_Click(object sender, RoutedEventArgs e)
@@ -207,7 +214,6 @@ namespace Uchet
             {
                 db.SaveChanges();
                 Close();
-
             }
         }
 
@@ -328,9 +334,6 @@ namespace Uchet
                     MessageBox.Show("Возникла ошибка при работе с базой данных. Окно будет закрыто.");
                     Close();
                 }
-
-
-
             }
         }
 

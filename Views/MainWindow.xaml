@@ -7,7 +7,7 @@
         xmlns:local="clr-namespace:Uchet"
         mc:Ignorable="d"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-        Title="Учет прибытия л/с" Height="800" Width="1200" MinWidth="1200" MinHeight="800" WindowStartupLocation="CenterScreen" WindowState="Maximized" IsVisibleChanged="Window_IsVisibleChanged">
+        Title="Учет прибытия л/с" Height="800" Width="1200" MinWidth="1200" MinHeight="800" WindowStartupLocation="CenterScreen" WindowState="Maximized">
 
     <Grid VerticalAlignment="Stretch" ClipToBounds="True" TextOptions.TextRenderingMode="ClearType" RenderOptions.BitmapScalingMode="NearestNeighbor">
         <Grid.ColumnDefinitions>
@@ -59,7 +59,7 @@
                     <Label Content="00:00:00" x:Name="LableSignalTime" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="18" FontWeight="Bold" />
                 </StackPanel>
                 <Label Content="дежурный по части:" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="16"  />
-                <ComboBox x:Name="ComboBoxRank" Width="200" Margin="5,0" Padding="5,0" Text="воинское звание" Foreground="Gray" IsEditable="True" IsReadOnly="True" FontSize="16" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" Loaded="ComboBoxRank_Loaded" DropDownOpened="ComboBoxRank_DropDownOpened" DropDownClosed="ComboBoxRank_DropDownClosed" SelectionChanged="ComboBoxRank_SelectionChanged"/>
+                <ComboBox x:Name="ComboBoxRank" Width="200" Margin="5,0" Padding="5,0" Text="воинское звание" Foreground="Gray" IsEditable="True" IsReadOnly="True" FontSize="16" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" Loaded="ComboBoxRank_Loaded" DropDownOpened="ComboBoxRank_DropDownOpened" DropDownClosed="ComboBoxRank_DropDownClosed"/>
                 <TextBox x:Name="TextBoxName" Width="200" TextWrapping="Wrap" Text="Фамилия И.О."  HorizontalAlignment="Stretch" VerticalAlignment="Stretch" FontSize="16" TextAlignment="Center" VerticalContentAlignment="Center" Foreground="Gray" GotFocus="TextBoxName_GotFocus" LostFocus="TextBoxName_LostFocus" PreviewKeyDown="TextBoxName_PreviewKeyDown" />
 
             </StackPanel>
@@ -180,6 +180,14 @@
                                             <LineBreak/>списку
                                         </TextBlock>
                                     </DataGridTextColumn.Header>
+                                    <DataGridTextColumn.CellStyle>
+                                        <Style TargetType="DataGridCell" BasedOn="{StaticResource MaterialDesignDataGridCell}">
+                                            <Setter Property="TextBlock.TextAlignment" Value="Center"/>
+                                            <Setter Property="TextBlock.MinWidth" Value="50"/>
+                                            <Setter Property="Padding" Value="0"/>
+                                            <Setter Property="Margin" Value="0"/>
+                                        </Style>
+                                    </DataGridTextColumn.CellStyle>
                                 </DataGridTextColumn>
                                 <DataGridTextColumn Binding="{Binding Path=OnFace}" MinWidth="65" IsReadOnly="True">
                                     <DataGridTextColumn.Header>
@@ -188,6 +196,14 @@
                                             <LineBreak/>лицо
                                         </TextBlock>
                                     </DataGridTextColumn.Header>
+                                    <DataGridTextColumn.CellStyle>
+                                        <Style TargetType="DataGridCell" BasedOn="{StaticResource MaterialDesignDataGridCell}">
+                                            <Setter Property="TextBlock.TextAlignment" Value="Center"/>
+                                            <Setter Property="TextBlock.MinWidth" Value="50"/>
+                                            <Setter Property="Padding" Value="0"/>
+                                            <Setter Property="Margin" Value="0"/>
+                                        </Style>
+                                    </DataGridTextColumn.CellStyle>
                                 </DataGridTextColumn>
                                 <DataGridTextColumn Binding="{Binding Path=OnService, UpdateSourceTrigger=PropertyChanged}" MinWidth="65">
                                     <DataGridTextColumn.Header>
@@ -196,6 +212,14 @@
                                             <LineBreak/>службе
                                         </TextBlock>
                                     </DataGridTextColumn.Header>
+                                    <DataGridTextColumn.CellStyle>
+                                        <Style TargetType="DataGridCell" BasedOn="{StaticResource MaterialDesignDataGridCell}">
+                                            <Setter Property="TextBlock.TextAlignment" Value="Center"/>
+                                            <Setter Property="TextBlock.MinWidth" Value="50"/>
+                                            <Setter Property="Padding" Value="0"/>
+                                            <Setter Property="Margin" Value="0"/>
+                                        </Style>
+                                    </DataGridTextColumn.CellStyle>
                                 </DataGridTextColumn>
                                 <DataGridTextColumn Binding="{Binding Path=Absent, UpdateSourceTrigger=PropertyChanged}" MinWidth="65">
                                     <DataGridTextColumn.Header>
@@ -204,6 +228,14 @@
                                             <LineBreak/>уважит.
                                         </TextBlock>
                                     </DataGridTextColumn.Header>
+                                    <DataGridTextColumn.CellStyle>
+                                        <Style TargetType="DataGridCell" BasedOn="{StaticResource MaterialDesignDataGridCell}">
+                                            <Setter Property="TextBlock.TextAlignment" Value="Center"/>
+                                            <Setter Property="TextBlock.MinWidth" Value="50"/>
+                                            <Setter Property="Padding" Value="0"/>
+                                            <Setter Property="Margin" Value="0"/>
+                                        </Style>
+                                    </DataGridTextColumn.CellStyle>
                                 </DataGridTextColumn>
                                 <DataGridTextColumn Binding="{Binding Path=ShouldCome}" MinWidth="65" IsReadOnly="True">
                                     <DataGridTextColumn.Header>
@@ -212,7 +244,14 @@
                                             <LineBreak/>приб.
                                         </TextBlock>
                                     </DataGridTextColumn.Header>
-
+                                    <DataGridTextColumn.CellStyle>
+                                        <Style TargetType="DataGridCell" BasedOn="{StaticResource MaterialDesignDataGridCell}">
+                                            <Setter Property="TextBlock.TextAlignment" Value="Center"/>
+                                            <Setter Property="TextBlock.MinWidth" Value="50"/>
+                                            <Setter Property="Padding" Value="0"/>
+                                            <Setter Property="Margin" Value="0"/>
+                                        </Style>
+                                    </DataGridTextColumn.CellStyle>
                                 </DataGridTextColumn>
                                 <DataGridTextColumn Binding="{Binding Path=Ch10, UpdateSourceTrigger=PropertyChanged}" MinWidth="65">
                                     <DataGridTextColumn.Header>
@@ -221,6 +260,14 @@
                                             <LineBreak/>+ 1.00
                                         </TextBlock>
                                     </DataGridTextColumn.Header>
+                                    <DataGridTextColumn.CellStyle>
+                                        <Style TargetType="DataGridCell" BasedOn="{StaticResource MaterialDesignDataGridCell}">
+                                            <Setter Property="TextBlock.TextAlignment" Value="Center"/>
+                                            <Setter Property="TextBlock.MinWidth" Value="50"/>
+                                            <Setter Property="Padding" Value="0"/>
+                                            <Setter Property="Margin" Value="0"/>
+                                        </Style>
+                                    </DataGridTextColumn.CellStyle>
                                 </DataGridTextColumn>
                                 <DataGridTextColumn Binding="{Binding Path=Ch15, UpdateSourceTrigger=PropertyChanged}" MinWidth="65">
                                     <DataGridTextColumn.Header>
@@ -229,6 +276,14 @@
                                             <LineBreak/>+ 1.30
                                         </TextBlock>
                                     </DataGridTextColumn.Header>
+                                    <DataGridTextColumn.CellStyle>
+                                        <Style TargetType="DataGridCell" BasedOn="{StaticResource MaterialDesignDataGridCell}">
+                                            <Setter Property="TextBlock.TextAlignment" Value="Center"/>
+                                            <Setter Property="TextBlock.MinWidth" Value="50"/>
+                                            <Setter Property="Padding" Value="0"/>
+                                            <Setter Property="Margin" Value="0"/>
+                                        </Style>
+                                    </DataGridTextColumn.CellStyle>
                                 </DataGridTextColumn>
                                 <DataGridTextColumn Binding="{Binding Path=Ch20, UpdateSourceTrigger=PropertyChanged}" MinWidth="65">
                                     <DataGridTextColumn.Header>
@@ -237,6 +292,14 @@
                                             <LineBreak/>+ 2.00
                                         </TextBlock>
                                     </DataGridTextColumn.Header>
+                                    <DataGridTextColumn.CellStyle>
+                                        <Style TargetType="DataGridCell" BasedOn="{StaticResource MaterialDesignDataGridCell}">
+                                            <Setter Property="TextBlock.TextAlignment" Value="Center"/>
+                                            <Setter Property="TextBlock.MinWidth" Value="50"/>
+                                            <Setter Property="Padding" Value="0"/>
+                                            <Setter Property="Margin" Value="0"/>
+                                        </Style>
+                                    </DataGridTextColumn.CellStyle>
                                 </DataGridTextColumn>
                                 <DataGridTextColumn  Binding="{Binding Path=NoArrived, UpdateSourceTrigger=PropertyChanged}" MinWidth="65" IsReadOnly="True">
                                     <DataGridTextColumn.Header>
@@ -245,8 +308,15 @@
                                             <LineBreak/>приб.
                                         </TextBlock>
                                     </DataGridTextColumn.Header>
+                                    <DataGridTextColumn.CellStyle>
+                                        <Style TargetType="DataGridCell" BasedOn="{StaticResource MaterialDesignDataGridCell}">
+                                            <Setter Property="TextBlock.TextAlignment" Value="Center"/>
+                                            <Setter Property="TextBlock.MinWidth" Value="50"/>
+                                            <Setter Property="Padding" Value="0"/>
+                                            <Setter Property="Margin" Value="0"/>
+                                        </Style>
+                                    </DataGridTextColumn.CellStyle>
                                 </DataGridTextColumn>
-
                             </DataGrid.Columns>
                         </DataGrid>
                     </StackPanel>
