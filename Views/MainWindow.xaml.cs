@@ -170,12 +170,15 @@ namespace Uchet
                     {
                         mainUser.Ch10 = currentTime.ToString(@"hh\:mm\:ss");
                         team.Ch10++;
+                        team.Ch15++;
+                        team.Ch20++;
                         team.NoArrived--;
                     }
                     else if (currentTime < Convert.ToDateTime("01:30:00") && (currentTime > Convert.ToDateTime("01:00:00")))
                     {
                         mainUser.Ch15 = currentTime.ToString(@"hh\:mm\:ss");
                         team.Ch15++;
+                        team.Ch20++;
                         team.NoArrived--;
                     }
                     else if (currentTime < Convert.ToDateTime("02:00:00"))
@@ -209,11 +212,14 @@ namespace Uchet
                     {
                         mainUser.Ch10 = null;
                         team.Ch10--;
+                        team.Ch15--;
+                        team.Ch20--;
                         team.NoArrived++;
                     } else if (mainUser.Ch15 != null)
                     {
                         mainUser.Ch15 = null;
                         team.Ch15--;
+                        team.Ch20--;
                         team.NoArrived++;
                     }
                     else if (mainUser.Ch20 != null)
@@ -816,22 +822,30 @@ namespace Uchet
         {
             Team selectedRow = DataGridTeam.SelectedItem as Team;
             if (selectedRow != null && DataGridTeam.Items.Count > 1)
-            {                
-                try
+            {
+                MessageBoxResult result = MessageBox.Show("Вы уверены, что хотите удалить данное подразделение?\n\n"
+                                                           + selectedRow.TeamName + "\n\n"
+                                                           + "Отменить данный выбор будет НЕВОЗМОЖНО!",
+                                                           "Проверка данных.Удаление последней записи",
+                                                           MessageBoxButton.YesNo, MessageBoxImage.Warning, MessageBoxResult.Yes);
+                if (result == MessageBoxResult.Yes)
                 {
-                    using (ApplicationContext db = new ApplicationContext()) ///
+                    try
                     {
-                        Team team = db.Teams.Find(selectedRow.id);
+                        using (ApplicationContext db = new ApplicationContext()) ///
+                        {
+                            Team team = db.Teams.Find(selectedRow.id);
 
-                        db.Teams.Remove(team);
-                        db.SaveChanges();
-                        RefreshGridTeams();
+                            db.Teams.Remove(team);
+                            db.SaveChanges();
+                            RefreshGridTeams();
+                        }
                     }
-                }
-                catch (Exception)
-                {
-                    MessageBox.Show("Возникла ошибка при работе с базой данных. Строка не удалена.");
-                }
+                    catch (Exception)
+                    {
+                        MessageBox.Show("Возникла ошибка при работе с базой данных. Строка не удалена.");
+                    }
+                }                    
             }
             else
             {
@@ -916,17 +930,15 @@ namespace Uchet
                         title.ParagraphFormat.SpaceAfter = 0;
                         wordDoc.Paragraphs.Add();
 
-                        if (type != "arrived" && type != "noArrived" && type != "goodReason") /// Таблица прибытия с процентами
+                        if (type != "noArrived" && type != "goodReason") /// Таблица прибытия с процентами
                         {
-                            Range titelTeams = wordDoc.Paragraphs[2].Range;
+                            Range titelTeams = wordDoc.Paragraphs.Last.Range;
                             titelTeams.Text = "Подразделения:\n";
                             titelTeams.Font.Size = 12;
                             titelTeams.Font.Name = "Times New Roman";
                             titelTeams.Font.Bold = 1;
                             titelTeams.ParagraphFormat.Alignment = WdParagraphAlignment.wdAlignParagraphJustify;
                             wordDoc.Paragraphs.Add();
-
-
 
                             currentRange = wordDoc.Paragraphs.Last.Range;
                             currentRange.Select();
@@ -937,88 +949,63 @@ namespace Uchet
                             tableTeams.Columns[2].Width = 50;
                             tableTeams.AutoFitBehavior(WdAutoFitBehavior.wdAutoFitWindow);
 
-                            tableTeams.Cell(1, 1).Range.Text = "Управление";
-                            foreach (Team team in teams)
-                            {
-                                tableTeams.Cell(1, 1).Range.Text += team.TeamName;
-                                tableTeams.Cell(1, 1).Range.ParagraphFormat.Alignment = WdParagraphAlignment.wdAlignParagraphLeft;
-                            }
-
-                            switch (type)
-                            {
-                                case "ch10":
-                                    tableTeams.Cell(1, 2).Range.Text = "- " + labelUprCh10.Content.ToString();
-                                    arrived = LabelArriveCh10.Content.ToString();
-                                    percent = LabelPercentCh10.Content.ToString();
-                                    break;
-                                case "ch15":
-                                    tableTeams.Cell(1, 2).Range.Text = "- " + labelUprCh15.Content.ToString();
-                                    arrived = LabelArriveCh15.Content.ToString();
-                                    percent = LabelPercentCh15.Content.ToString();
-                                    break;
-                                case "ch20":
-                                    tableTeams.Cell(1, 2).Range.Text = "- " + labelUprCh20.Content.ToString();
-                                    arrived = LabelArriveCh20.Content.ToString();
-                                    percent = LabelPercentCh20.Content.ToString();
-                                    break;
-                            }
-
+                            tableTeams.Cell(1, 1).Range.ParagraphFormat.Alignment = WdParagraphAlignment.wdAlignParagraphLeft;
                             tableTeams.Cell(1, 2).Range.ParagraphFormat.Alignment = WdParagraphAlignment.wdAlignParagraphLeft;
-                            foreach (Team team in teams)
-                            {
-                                switch (type)
-                                {
-                                    case "ch10":
-                                        tableTeams.Cell(1, 2).Range.Text += "- " + team.Ch10;
-                                        break;
-                                    case "ch15":
-                                        tableTeams.Cell(1, 2).Range.Text += "- " + team.Ch15;
-                                        break;
-                                    case "ch20":
-                                        tableTeams.Cell(1, 2).Range.Text += "- " + team.Ch20;
-                                        break;
-                                }
-
-                            }
-
-                            switch (type)
-                            {
-                                case "ch10":
-                                    tableTeams.Cell(1, 3).Range.Text = "ВСЕГО: " + LabelArriveCh10.Content.ToString();
-                                    break;
-                                case "ch15":
-                                    tableTeams.Cell(1, 3).Range.Text = "ВСЕГО: " + LabelArriveCh15.Content.ToString();
-                                    break;
-                                case "ch20":
-                                    tableTeams.Cell(1, 3).Range.Text = "ВСЕГО: " + LabelArriveCh20.Content.ToString();
-                                    break;
-                            }
 
                             tableTeams.Cell(1, 3).Range.Font.Bold = 1;
                             tableTeams.Cell(1, 3).Range.Font.Size = 24;
                             tableTeams.Cell(1, 3).VerticalAlignment = WdCellVerticalAlignment.wdCellAlignVerticalCenter;
-                            switch (type)
-                            {
-                                case "ch10":
-                                    tableTeams.Cell(1, 4).Range.Text = LabelPercentCh10.Content.ToString();
-                                    break;
-                                case "ch15":
-                                    tableTeams.Cell(1, 4).Range.Text = LabelPercentCh15.Content.ToString();
-                                    break;
-                                case "ch20":
-                                    tableTeams.Cell(1, 4).Range.Text = LabelPercentCh20.Content.ToString();
-                                    break;
-                            }
 
                             tableTeams.Cell(1, 4).Range.Font.Bold = 1;
                             tableTeams.Cell(1, 4).Range.Font.Size = 24;
                             tableTeams.Cell(1, 4).VerticalAlignment = WdCellVerticalAlignment.wdCellAlignVerticalCenter;
 
+                            switch (type)
+                            {
+                                case "ch10":
+                                    arrived = LabelArriveCh10.Content.ToString();
+                                    percent = LabelPercentCh10.Content.ToString();
+                                    break;
+                                case "ch15":
+                                    arrived = LabelArriveCh15.Content.ToString();
+                                    percent = LabelPercentCh15.Content.ToString();
+                                    break;
+                                default:
+                                    arrived = LabelArriveCh20.Content.ToString();
+                                    percent = LabelPercentCh20.Content.ToString();
+                                    break;
+                            }
+                            foreach (Team team in teams)
+                            {
+                                tableTeams.Cell(1, 1).Range.Text += team.TeamName;
+
+                                switch (type)
+                                {
+                                    case "ch10":
+                                        tableTeams.Cell(1, 2).Range.Text += "- " + team.Ch10;
+                                        tableTeams.Cell(1, 3).Range.Text = "ВСЕГО: " + LabelArriveCh10.Content.ToString();
+                                        tableTeams.Cell(1, 4).Range.Text = LabelPercentCh10.Content.ToString();
+                                        break;
+                                    case "ch15":
+                                        tableTeams.Cell(1, 2).Range.Text += "- " + team.Ch15;
+                                        tableTeams.Cell(1, 3).Range.Text = "ВСЕГО: " + LabelArriveCh15.Content.ToString();
+                                        tableTeams.Cell(1, 4).Range.Text = LabelPercentCh15.Content.ToString();
+                                        break;
+                                    default:
+                                        tableTeams.Cell(1, 2).Range.Text += "- " + team.Ch20;
+                                        tableTeams.Cell(1, 3).Range.Text = "ВСЕГО: " + LabelArriveCh20.Content.ToString();
+                                        tableTeams.Cell(1, 4).Range.Text = LabelPercentCh20.Content.ToString();
+                                        break;
+                                }
+                            }
+
                             wordDoc.Paragraphs.Add();
-                        }
+                        }                        
 
                         currentRange = wordDoc.Paragraphs.Last.Range;
                         currentRange.Select();
+                        currentRange.Font.Bold = 0;
+                        currentRange.Font.Size = 10;
                         currentRange.ParagraphFormat.Alignment = WdParagraphAlignment.wdAlignParagraphLeft;
 
                         if (type == "goodReason" || type == "noArrived")
@@ -1049,7 +1036,7 @@ namespace Uchet
                         foreach (MainUser mainUser in db.MainUsers)
                         {
                             if (mainUser != null)
-                            {
+                            { 
                                 switch (type)
                                 {
                                     case "ch10":
@@ -1103,6 +1090,7 @@ namespace Uchet
                                     case "arrived":
                                         if (mainUser.Ch10 != null || mainUser.Ch15 != null || mainUser.Ch20 != null)
                                         {
+                                            user = db.Users.Find(mainUser.UserId);
                                             rank = db.Ranks.Find(user.RankId);
                                             tableMain.Rows.Add(tableMain.Rows[i]);
                                             tableMain.Rows[i].Borders[WdBorderType.wdBorderBottom].LineStyle = WdLineStyle.wdLineStyleSingle;
@@ -1119,6 +1107,7 @@ namespace Uchet
                                         if (mainUser.StatusId == 1 &&
                                             mainUser.Ch10 is null && mainUser.Ch15 is null && mainUser.Ch20 is null)
                                         {
+                                            user = db.Users.Find(mainUser.UserId);
                                             rank = db.Ranks.Find(user.RankId);
                                             tableMain.Rows.Add(tableMain.Rows[i]);
                                             tableMain.Rows[i].Borders[WdBorderType.wdBorderBottom].LineStyle = WdLineStyle.wdLineStyleSingle;
@@ -1135,6 +1124,7 @@ namespace Uchet
                                         {
                                             if (mainUser.StatusId != 1 && mainUser.StatusId != 6) //1 - На лицо, 6 - ВАКАНТ
                                             {
+                                                user = db.Users.Find(mainUser.UserId);
                                                 rank = db.Ranks.Find(user.RankId);
                                                 status = db.Statuses.Find(mainUser.StatusId);
                                                 tableMain.Rows.Add(tableMain.Rows[i]);
@@ -1171,7 +1161,6 @@ namespace Uchet
                         }
                         catch (Exception)
                         {
-
                             throw;
                         }
 
