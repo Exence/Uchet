@@ -111,7 +111,7 @@ namespace Uchet
                         }
                         else
                         {
-                            if (mainUser.StatusId == 2)
+                            if (mainUser.StatusId == 5) // На службе
                             {
                                 onService += 1;
                             }
@@ -121,15 +121,15 @@ namespace Uchet
                             }
                         }
 
-                        if (mainUser.Ch10 != null) { ch10++; }
-                        else if (mainUser.Ch15 != null) { ch15++; }
+                        if (mainUser.Ch10 != null) { ch10++; ch15++; ch20++; }
+                        else if (mainUser.Ch15 != null) { ch15++; ch20++; }
                         else if (mainUser.Ch20 != null) { ch20++; }
                     }
 
-                    team.OnFace = team.OnList - absent - onService;
+                    team.OnFace = team.OnList - absent;
                     team.OnService = onService;
                     team.Absent = absent;
-                    team.ShouldCome = team.OnFace - ch10 - ch15 - ch20;
+                    team.ShouldCome = team.OnFace - onService;
                     team.Ch10 = ch10;
                     team.Ch15 = ch15;
                     team.Ch20 = ch20;
@@ -156,14 +156,13 @@ namespace Uchet
             RefreshGridUsers();
         }
 
-        private void CheckArrive(DateTime currentTime)
+        private void CheckArrive(DateTime currentTime, int Num)
         {
             try
             {
                 using (ApplicationContext db = new ApplicationContext())
                 {
-                    ArriveUser selectedRow = GridUsers.SelectedItem as ArriveUser;
-                    MainUser mainUser = db.MainUsers.Where(mu => mu.Num == selectedRow.num).FirstOrDefault();
+                    MainUser mainUser = db.MainUsers.Where(mu => mu.Num == Num).FirstOrDefault();
                     Team team = db.Teams.Find(1);
 
                     if (currentTime < Convert.ToDateTime("01:00:00"))
@@ -197,14 +196,13 @@ namespace Uchet
                 Close();
             }            
         }
-        private void UncheckArrive()
+        private void UncheckArrive(int Num)
         {
             try
             {
                 using (ApplicationContext db = new ApplicationContext())
-                {
-                    ArriveUser selectedRow = GridUsers.SelectedItem as ArriveUser;
-                    MainUser mainUser = db.MainUsers.Where(mu => mu.Num == selectedRow.num).FirstOrDefault();
+                {                    
+                    MainUser mainUser = db.MainUsers.Where(mu => mu.Num == Num).FirstOrDefault();
                     Team team = db.Teams.Find(1);
 
 
@@ -258,13 +256,13 @@ namespace Uchet
                                 mainUser.time = LableTime.Content.ToString();
                                 currentTime = Convert.ToDateTime((Convert.ToDateTime(mainUser.time) - Flags.ConvertedTime)
                                                                   .ToString(@"hh\:mm\:ss"));
-                                CheckArrive(currentTime);
+                                CheckArrive(currentTime, mainUser.Num);
                             }
                             else
                             {
                                 currentTime = Convert.ToDateTime((Convert.ToDateTime(mainUser.time) - Flags.ConvertedTime)
                                                                   .ToString(@"hh\:mm\:ss"));
-                                UncheckArrive();
+                                UncheckArrive(mainUser.Num);
                                 mainUser.arriveStatus = 0;
                                 mainUser.time = string.Empty;
                             }
@@ -300,6 +298,7 @@ namespace Uchet
             ButtonGoodReason.IsEnabled = true;
             ButtonNoArrive.IsEnabled = true;
             MenuReports.IsEnabled = true;
+            MenuKPPReport.IsEnabled = true;
             LabelArriveCh10.Content = "0";
             LabelArriveCh15.Content = "0";
             LabelArriveCh20.Content = "0";
@@ -424,6 +423,8 @@ namespace Uchet
                 {
                     foreach (Team team in db.Teams)
                     {
+                        team.NoArrived = team.ShouldCome - team.Ch20;
+
                         if (team.id != 1)
                         {
                             teams.Add(team);                            
@@ -473,6 +474,8 @@ namespace Uchet
                     FindPercent(LabelPercentCh10, LabelArriveCh10, labelShouldCome);
                     FindPercent(LabelPercentCh15, LabelArriveCh15, labelShouldCome);
                     FindPercent(LabelPercentCh20, LabelArriveCh20, labelShouldCome);
+
+                    db.SaveChanges();
                 }
                 DataGridTeam.SelectedIndex = selectedIndex;
 
@@ -567,7 +570,7 @@ namespace Uchet
             }
         }
 
-        private void TextBoxMinutes_PreviewTextInput(object sender, TextCompositionEventArgs e)
+        private void TextBoxMinutes_PreviewTextInput(object sender, TextCompositionEventArgs e) /// Ввод только цифр и не более 2-х
         {
             Match match = inputRegex.Match(e.Text);
             if ((sender as TextBox).Text.Length >= 2 || !match.Success)
@@ -576,7 +579,7 @@ namespace Uchet
             }
         }
 
-        private void TextBoxHours_KeyUp(object sender, KeyEventArgs e) ///24-часовой формат
+        private void TextBoxHours_KeyUp(object sender, KeyEventArgs e) /// 24-часовой формат
         {
             if (TextBoxHours.Text != string.Empty && Convert.ToInt16(TextBoxHours.Text) > 23)
             {
@@ -586,7 +589,7 @@ namespace Uchet
 
         }
 
-        private void TextBoxMinutes_KeyUp(object sender, KeyEventArgs e)///24-часовой формат
+        private void TextBoxMinutes_KeyUp(object sender, KeyEventArgs e) /// 24-часовой формат
         {
             if (TextBoxMinutes.Text != string.Empty && Convert.ToInt16(TextBoxMinutes.Text) > 59)
             {
@@ -595,42 +598,42 @@ namespace Uchet
             }
         }
 
-        private void TextBoxMinutes_PreviewKeyDown(object sender, KeyEventArgs e)///Запрет на ввод пробела
+        private void TextBoxMinutes_PreviewKeyDown(object sender, KeyEventArgs e) /// Запрет на ввод пробела
         {
             if (e.Key == Key.Space)
                 e.Handled = true;
         }
 
-        private void TextBoxHours_PreviewKeyDown(object sender, KeyEventArgs e)///Запрет на ввод пробела
+        private void TextBoxHours_PreviewKeyDown(object sender, KeyEventArgs e) /// Запрет на ввод пробела
         {
             if (e.Key == Key.Space)
                 e.Handled = true;
         }
 
-        private void TextBoxHours_GotFocus(object sender, RoutedEventArgs e)
+        private void TextBoxHours_GotFocus(object sender, RoutedEventArgs e) /// Очистка поля при постановке курсора
         {
-            if (TextBoxHours.Text == "00")
-                TextBoxHours.Text = string.Empty;
+            Flags.hh = TextBoxHours.Text;
+            TextBoxHours.Text = string.Empty;
         }
 
-        private void TextBoxHours_LostFocus(object sender, RoutedEventArgs e)
+        private void TextBoxHours_LostFocus(object sender, RoutedEventArgs e) /// Если строка осталась пустой - присваиваем предыдущее значение
         {
             if (TextBoxHours.Text == string.Empty)
-                TextBoxHours.Text = "00";
+                TextBoxHours.Text = Flags.hh;
             else if (TextBoxHours.Text.Length == 1)
                 TextBoxHours.Text = "0" + TextBoxHours.Text;
         }
 
-        private void TextBoxMinutes_GotFocus(object sender, RoutedEventArgs e)
+        private void TextBoxMinutes_GotFocus(object sender, RoutedEventArgs e) /// Очистка поля при постановке курсора
         {
-            if (TextBoxMinutes.Text == "00")
-                TextBoxMinutes.Text = string.Empty;
+            Flags.mm = TextBoxMinutes.Text;
+            TextBoxMinutes.Text = string.Empty;
         }
 
-        private void TextBoxMinutes_LostFocus(object sender, RoutedEventArgs e)
+        private void TextBoxMinutes_LostFocus(object sender, RoutedEventArgs e) /// Если строка осталась пустой - присваиваем предыдущее значение
         {
             if (TextBoxMinutes.Text == string.Empty)
-                TextBoxMinutes.Text = "00";
+                TextBoxMinutes.Text = Flags.mm;
             else if (TextBoxMinutes.Text.Length == 1)
                 TextBoxMinutes.Text = "0" + TextBoxMinutes.Text;
         }
@@ -768,16 +771,16 @@ namespace Uchet
                                             if (parsedString.arriveTime < dt)
                                             {
                                                 dt = Convert.ToDateTime((dt - Flags.ConvertedTime).ToString(@"hh\:mm\:ss"));
-                                                UncheckArrive();
+                                                UncheckArrive(mainUser.Num);
                                                 mainUser.Time = parsedString.arriveTime.ToString();
-                                                CheckArrive(parsedString.timeAfterSignal);
+                                                CheckArrive(parsedString.timeAfterSignal, mainUser.Num);
                                             }
                                         }
                                         else
                                         {
                                             mainUser.ArriveStatus = 1;
                                             mainUser.Time = parsedString.arriveTime.ToString();
-                                            CheckArrive(parsedString.timeAfterSignal);
+                                            CheckArrive(parsedString.timeAfterSignal, mainUser.Num);
                                         }
                                     }
                                 }

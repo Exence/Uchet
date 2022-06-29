@@ -21,7 +21,7 @@
         <Menu VerticalAlignment="Top" Height="26" Margin="0,0,0,10" Grid.ColumnSpan="3">
             <MenuItem Header="Файл" Height="25">
                 <MenuItem Header="Загрузить" >
-                    <MenuItem Header="Отчет с КПП" Click="ButtonParse_Click"></MenuItem>
+                    <MenuItem x:Name="MenuKPPReport" Header="Отчет с КПП" Click="ButtonParse_Click" IsEnabled="False"></MenuItem>
                 </MenuItem>
                 <MenuItem Header="Редактировать" >
                     <MenuItem Header="Таблица 'Управление'" Click="ButtonEditUsers_Click"/>
@@ -202,6 +202,9 @@
                                             <Setter Property="TextBlock.MinWidth" Value="50"/>
                                             <Setter Property="Padding" Value="0"/>
                                             <Setter Property="Margin" Value="0"/>
+                                            <Setter Property="Background" Value="#f2f2f2"/>
+                                            <Setter Property="BorderBrush" Value="#f2f2f2"/>
+                                            <Setter Property="FontWeight" Value="Bold"/>
                                         </Style>
                                     </DataGridTextColumn.CellStyle>
                                 </DataGridTextColumn>
@@ -250,6 +253,9 @@
                                             <Setter Property="TextBlock.MinWidth" Value="50"/>
                                             <Setter Property="Padding" Value="0"/>
                                             <Setter Property="Margin" Value="0"/>
+                                            <Setter Property="Background" Value="#f2f2f2"/>
+                                            <Setter Property="BorderBrush" Value="#f2f2f2"/>
+                                            <Setter Property="FontWeight" Value="Bold"/>
                                         </Style>
                                     </DataGridTextColumn.CellStyle>
                                 </DataGridTextColumn>
@@ -314,6 +320,9 @@
                                             <Setter Property="TextBlock.MinWidth" Value="50"/>
                                             <Setter Property="Padding" Value="0"/>
                                             <Setter Property="Margin" Value="0"/>
+                                            <Setter Property="Background" Value="#f2f2f2"/>
+                                            <Setter Property="BorderBrush" Value="#f2f2f2"/>
+                                            <Setter Property="FontWeight" Value="Bold"/>
                                         </Style>
                                     </DataGridTextColumn.CellStyle>
                                 </DataGridTextColumn>

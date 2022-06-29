@@ -130,12 +130,14 @@ namespace Uchet
                 Rank rank = null;
                 User user = null;
                 Status status = null;
+                
                 bool isRefreshNeeded = false;
                 try
                 {
                     using (ApplicationContext db = new ApplicationContext())
                     {
                         MainUser mainUser = db.MainUsers.Find(selectedRow.mainId);
+                        //Team team = db.Teams.Find(1);
 
                         if (mainUser != null)
                         {
