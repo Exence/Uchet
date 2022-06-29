@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Uchet.Classes
+﻿namespace Uchet.Classes
 {
     class MainUser
     {
@@ -12,7 +6,7 @@ namespace Uchet.Classes
 
         public int num, userId, statusId, arriveStatus;
 
-        public string time , ch10 , ch15 , ch20;
+        public string time, ch10, ch15, ch20;
 
         public int Num
         {

@@ -1,16 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Controls;
+﻿using System.ComponentModel;
 
 namespace Uchet.Classes
 {
     internal class Team : INotifyPropertyChanged
-    { 
+    {
 
         private int onList, onFace, onService, absent, ch10, ch15, ch20, noArrived, shouldCome;
 
@@ -21,7 +14,8 @@ namespace Uchet.Classes
         public int OnList
         {
             get { return onList; }
-            set {
+            set
+            {
                 if (onList != value)
                 {
                     onList = value;
@@ -32,7 +26,8 @@ namespace Uchet.Classes
         public int OnFace
         {
             get { return onFace; }
-            set {
+            set
+            {
                 if (onFace != value)
                 {
                     onFace = value;
@@ -43,29 +38,32 @@ namespace Uchet.Classes
         public int OnService
         {
             get { return onService; }
-            set {
+            set
+            {
                 if (onService != value)
                 {
                     onService = value;
                     OnPropertyChanged("onService");
                 }
-             }
+            }
         }
         public int Absent
         {
             get { return absent; }
-            set {
+            set
+            {
                 if (absent != value)
                 {
                     absent = value;
                     OnPropertyChanged("absent");
                 }
-             }
+            }
         }
         public int Ch10
         {
             get { return ch10; }
-            set {
+            set
+            {
                 if (ch10 != value)
                 {
                     ch10 = value;
@@ -76,7 +74,8 @@ namespace Uchet.Classes
         public int Ch15
         {
             get { return ch15; }
-            set {
+            set
+            {
                 if (ch15 != value)
                 {
                     ch15 = value;
@@ -87,7 +86,8 @@ namespace Uchet.Classes
         public int Ch20
         {
             get { return ch20; }
-            set {
+            set
+            {
                 if (ch20 != value)
                 {
                     ch20 = value;
@@ -98,7 +98,8 @@ namespace Uchet.Classes
         public int NoArrived
         {
             get { return noArrived; }
-            set {
+            set
+            {
                 if (noArrived != value)
                 {
                     noArrived = value;
@@ -109,7 +110,8 @@ namespace Uchet.Classes
         public int ShouldCome
         {
             get { return shouldCome; }
-            set {
+            set
+            {
                 if (shouldCome != value)
                 {
                     shouldCome = value;
@@ -120,7 +122,8 @@ namespace Uchet.Classes
         public string TeamName
         {
             get { return teamName; }
-            set {
+            set
+            {
                 if (teamName != value)
                 {
                     teamName = value;

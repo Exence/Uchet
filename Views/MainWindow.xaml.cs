@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Office.Interop.Word;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
@@ -11,9 +12,8 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
 using Uchet.Classes;
-using Microsoft.Office.Interop.Word;
-using Application = Microsoft.Office.Interop.Word.Application;
 using Uchet.Views;
+using Application = Microsoft.Office.Interop.Word.Application;
 
 namespace Uchet
 {
@@ -86,7 +86,7 @@ namespace Uchet
                     List<MainUser> mainUsers = db.MainUsers.OrderBy(mu => mu.Num).ToList();
                     Team team = db.Teams.Find(1);
 
-                    team.OnList = mainUsers.Count;                    
+                    team.OnList = mainUsers.Count;
 
                     foreach (MainUser mainUser in mainUsers)
                     {
@@ -143,7 +143,7 @@ namespace Uchet
 
 
                 arriveUsers.ListChanged += ArriveUsers_ListChanged;
-                RefreshGridTeams();                
+                RefreshGridTeams();
             }
             catch (Exception)
             {
@@ -181,27 +181,27 @@ namespace Uchet
                         team.NoArrived--;
                     }
                     else if (currentTime < Convert.ToDateTime("02:00:00"))
-                    {                        
+                    {
                         mainUser.Ch20 = currentTime.ToString(@"hh\:mm\:ss");
                         team.Ch20++;
                         team.NoArrived--;
-                    }                    
+                    }
 
-                    db.SaveChanges();                    
+                    db.SaveChanges();
                 }
             }
             catch (Exception)
             {
                 MessageBox.Show("Возникла ошибка при работе с базой данных. Продолжение невозможно.");
                 Close();
-            }            
+            }
         }
         private void UncheckArrive(int Num)
         {
             try
             {
                 using (ApplicationContext db = new ApplicationContext())
-                {                    
+                {
                     MainUser mainUser = db.MainUsers.Where(mu => mu.Num == Num).FirstOrDefault();
                     Team team = db.Teams.Find(1);
 
@@ -213,7 +213,8 @@ namespace Uchet
                         team.Ch15--;
                         team.Ch20--;
                         team.NoArrived++;
-                    } else if (mainUser.Ch15 != null)
+                    }
+                    else if (mainUser.Ch15 != null)
                     {
                         mainUser.Ch15 = null;
                         team.Ch15--;
@@ -225,10 +226,10 @@ namespace Uchet
                         mainUser.Ch20 = null;
                         team.Ch20--;
                         team.NoArrived++;
-                    }                    
-                   
+                    }
+
                     db.SaveChanges();
-                }                
+                }
             }
             catch (Exception)
             {
@@ -427,14 +428,15 @@ namespace Uchet
 
                         if (team.id != 1)
                         {
-                            teams.Add(team);                            
-                        } else
+                            teams.Add(team);
+                        }
+                        else
                         {
                             labelUprOnList.Content = team.OnList.ToString();
                             labelUprOnFace.Content = team.OnFace.ToString();
                             labelUprOnService.Content = team.OnService.ToString();
                             labelUprAbsent.Content = team.Absent.ToString();
-                            labelUprCh10.Content = team.Ch10.ToString();                            
+                            labelUprCh10.Content = team.Ch10.ToString();
                             labelUprCh15.Content = team.Ch15.ToString();
                             labelUprCh20.Content = team.Ch20.ToString();
                             labelUprNoArrive.Content = team.NoArrived.ToString();
@@ -457,7 +459,7 @@ namespace Uchet
 
                     labelOnList.Content = onList.ToString();
                     labelOnList.Content = onList.ToString();
-                    labelOnFace.Content =onFace.ToString();
+                    labelOnFace.Content = onFace.ToString();
                     labelOnService.Content = onService.ToString();
                     labelAbsent.Content = absent.ToString();
                     labelCh10.Content = ch10.ToString();
@@ -469,7 +471,7 @@ namespace Uchet
                     labelNoArrive.Content = noArrived.ToString();
                     labelShouldCome.Content = shouldCome.ToString();
 
-                    
+
 
                     FindPercent(LabelPercentCh10, LabelArriveCh10, labelShouldCome);
                     FindPercent(LabelPercentCh15, LabelArriveCh15, labelShouldCome);
@@ -736,8 +738,8 @@ namespace Uchet
                         {
                             using (ApplicationContext db = new ApplicationContext()) ///
                             {
-                                List<int> numbers = new List<int>(); 
-                                List <User> users = db.Users.Where(u => u.Surname == parsedString.surname &&
+                                List<int> numbers = new List<int>();
+                                List<User> users = db.Users.Where(u => u.Surname == parsedString.surname &&
                                                                 u.Name == parsedString.name &&
                                                                 u.MiddleName == parsedString.middleName).ToList();
                                 User user = users.First();
@@ -759,7 +761,7 @@ namespace Uchet
                                         user = users[Flags.selectedIndex];
                                     }
                                 }
-                                
+
                                 if (user != null)
                                 {
                                     mainUser = db.MainUsers.Where(mu => mu.UserId == user.id).FirstOrDefault();
@@ -849,7 +851,7 @@ namespace Uchet
                     {
                         MessageBox.Show("Возникла ошибка при работе с базой данных. Строка не удалена.");
                     }
-                }                    
+                }
             }
             else
             {
@@ -861,7 +863,7 @@ namespace Uchet
         {
             EditTableWindow editTableWindow = new EditTableWindow();
             editTableWindow.ShowDialog();
-            RefreshGridUsers();            
+            RefreshGridUsers();
         }
 
         private void DataGridTeam_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
@@ -869,7 +871,7 @@ namespace Uchet
             RefreshGridTeams();
         }
 
-        private void WordReport (string type)
+        private void WordReport(string type)
         {
             if (ComboBoxRank.SelectedIndex == -1 || TextBoxName.Text == "Фамилия И.О.")
             {
@@ -909,7 +911,7 @@ namespace Uchet
                                 break;
                             case "ch20":
                                 title.Text = "Отчет о прибытии на Ч+2.00\n";
-                                break;                            
+                                break;
                             case "arrived":
                                 title.Text = "Отчет о прибытии\nВремя с подачи сигнала: " + LableSignalTime.Content;
                                 wordDoc.Paragraphs.Add();
@@ -1046,7 +1048,7 @@ namespace Uchet
                         foreach (MainUser mainUser in db.MainUsers)
                         {
                             if (mainUser != null)
-                            { 
+                            {
                                 switch (type)
                                 {
                                     case "ch10":
@@ -1151,7 +1153,7 @@ namespace Uchet
                                         break;
                                     default:
                                         break;
-                                }                                
+                                }
                             }
                         }
 

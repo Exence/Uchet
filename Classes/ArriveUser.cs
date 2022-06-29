@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 
 namespace Uchet.Classes
 {
-    internal class ArriveUser:INotifyPropertyChanged 
+    internal class ArriveUser : INotifyPropertyChanged
     {
         private bool _isArrive;
         public int num { get; set; }
@@ -29,7 +24,7 @@ namespace Uchet.Classes
 
 
         public ArriveUser() { }
-        public ArriveUser (int num, string rank, string fName, bool isArrive)
+        public ArriveUser(int num, string rank, string fName, bool isArrive)
         {
             this.num = num;
             this.rank = rank;

@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Uchet.Classes
+﻿namespace Uchet.Classes
 {
     internal class User
     {
@@ -53,7 +47,7 @@ namespace Uchet.Classes
 
         public User(int rankId)
         {
-            this.rankId = rankId;            
+            this.rankId = rankId;
         }
     }
 }

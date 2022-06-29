@@ -1,26 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using System.Data.Entity;
-using System.Globalization;
-using System.Windows.Threading;
-using System.Windows.Controls.Primitives;
-using System.Data;
-using System.Data.SqlClient;
 using Uchet.Classes;
-using System.ComponentModel;
-using System.Collections.ObjectModel;
 
 
 namespace Uchet
@@ -130,7 +115,7 @@ namespace Uchet
                 Rank rank = null;
                 User user = null;
                 Status status = null;
-                
+
                 bool isRefreshNeeded = false;
                 try
                 {
@@ -440,7 +425,8 @@ namespace Uchet
                     }
                 }
 
-            } else
+            }
+            else
             {
                 MessageBox.Show("Нельзя удалить последний элемент в таблице!");
             }
