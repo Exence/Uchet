@@ -29,7 +29,7 @@
                 <Separator />
                 <MenuItem Header="Выход" Click="ButtonClose_Click"></MenuItem>
             </MenuItem>
-            <MenuItem x:Name="MenuReports" Header="Списки" Height="25" >
+            <MenuItem x:Name="MenuReports" Header="Списки" Height="25" IsEnabled="False" >
                 <MenuItem Header="Список 'Ч+1.00'" Click="ButtonCh10_Click"></MenuItem>
                 <MenuItem Header="Список 'Ч+1.30'" Click="ButtonCh15_Click"></MenuItem>
                 <MenuItem Header="Список 'Ч+2.00'" Click="ButtonCh20_Click"></MenuItem>                

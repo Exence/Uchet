@@ -299,7 +299,7 @@ namespace Uchet
             ButtonArrive.IsEnabled = true;
             ButtonGoodReason.IsEnabled = true;
             ButtonNoArrive.IsEnabled = true;
-
+            MenuReports.IsEnabled = true;
             LabelArriveCh10.Content = "0";
             LabelArriveCh15.Content = "0";
             LabelArriveCh20.Content = "0";
